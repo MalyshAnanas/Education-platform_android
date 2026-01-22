@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/routeFragment"
+        android:icon="@drawable/route_icon"
+        android:title="@string/route"/>
+
+    <item
+        android:id="@+id/practicumFragment"
+        android:icon="@drawable/practicum_icon"
+        android:title="@string/practicum"/>
+
+    <item
+        android:id="@+id/monitoringFragment"
+        android:icon="@drawable/monitoring_icon"
+        android:title="@string/monitoring"/>
+
+    <item
+        android:id="@+id/reflectionFragment"
+        android:icon="@drawable/reflection_icon"
+        android:title="@string/reflection"/>
+
+</menu>

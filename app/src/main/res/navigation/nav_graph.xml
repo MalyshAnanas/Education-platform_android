@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/registrationFragment">
+
+    <fragment
+        android:id="@+id/registrationFragment"
+        android:name="com.hfad.digital_assistant.RegistrationFragment"
+        android:label="fragment_registration"
+        tools:layout="@layout/fragment_registration" >
+        <action
+            android:id="@+id/action_registrationFragment_to_mainFragment"
+            app:destination="@id/mainFragment" >
+            <argument
+                android:name="userName"
+                app:argType="string" />
+            <argument
+                android:name="userSurname"
+                app:argType="string" />
+            <argument
+                android:name="userPatronymic"
+                app:argType="string" />
+        </action>
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/mainFragment"
+        android:name="com.hfad.digital_assistant.MainFragment"
+        android:label="fragment_main"
+        tools:layout="@layout/fragment_main" >
+    <argument
+        android:name="userName"
+        app:argType="string" />
+    <argument
+        android:name="userSurname"
+        app:argType="string" />
+    <argument
+        android:name="userPatronymic"
+        app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/routeFragment"
+        android:name="com.hfad.digital_assistant.RouteFragment"
+        android:label="Route"
+        tools:layout="@layout/fragment_route" />
+
+    <fragment
+        android:id="@+id/practicumFragment"
+        android:name="com.hfad.digital_assistant.PracticumFragment"
+        android:label="Practicum"
+        tools:layout="@layout/fragment_practicum" />
+
+    <fragment
+        android:id="@+id/monitoringFragment"
+        android:name="com.hfad.digital_assistant.MonitoringFragment"
+        android:label="Monitoring"
+        tools:layout="@layout/fragment_monitoring" />
+
+    <fragment
+        android:id="@+id/reflectionFragment"
+        android:name="com.hfad.digital_assistant.ReflectionFragment"
+        android:label="Reflection"
+        tools:layout="@layout/fragment_reflection" />
+
+</navigation>

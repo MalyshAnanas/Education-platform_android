@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ТЕМА ПРИЛОЖЕНИЯ (ГЛАВНОЕ!) -->
+    <style name="Theme.DigitalAssistant" parent="Theme.Digital_assistant">
+        <!-- Основной цвет -->
+        <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorPrimaryDark">@color/purple_700</item>
+        <item name="colorAccent">@color/teal_200</item>
+
+        <!-- Фон окна -->
+        <item name="android:windowBackground">@color/white</item>
+
+        <!-- Статус бар -->
+        <item name="android:statusBarColor">?attr/colorPrimaryDark</item>
+    </style>
+
+    <!-- стиль для кнопок -->
+    <style name="ButtonStyle" parent="Widget.AppCompat.Button">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:padding">10dp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <!-- стиль для EditText -->
+    <style name="EditTextBlueTheme" parent="Widget.AppCompat.EditText">
+        <item name="colorControlActivated">@color/blue_for_blocks</item>
+        <item name="colorControlNormal">@color/gray_for_blocks</item>
+    </style>
+
+    <style name="chat_edit_text" parent="Widget.AppCompat.EditText">
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:textColorHint">@color/gray_for_text</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:inputType">textPersonName</item>
+        <item name="android:textCursorDrawable">@drawable/blue_cursor</item>
+        <item name="android:textSelectHandle">@color/blue_for_blocks</item>
+    </style>
+
+</resources>
