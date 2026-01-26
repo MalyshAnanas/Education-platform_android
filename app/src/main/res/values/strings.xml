@@ -3,6 +3,7 @@
     <string name="Welcome_text">Добрый вечер, Дебилка!</string>
     <string name="route">Маршрут</string>
     <string name="practicum">Практикум</string>
+    <string name="main">Главная</string>
     <string name="monitoring">Мониторинг</string>
     <string name="reflection">Рефлексия</string>
     <!-- TODO: Remove or change this placeholder text -->

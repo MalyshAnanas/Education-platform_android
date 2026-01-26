@@ -11,6 +11,11 @@
         android:title="@string/practicum"/>
 
     <item
+        android:id="@+id/mainFragment"
+        android:icon="@drawable/main_icon"
+        android:title="@string/main"/>
+
+    <item
         android:id="@+id/monitoringFragment"
         android:icon="@drawable/monitoring_icon"
         android:title="@string/monitoring"/>
