@@ -1,4 +1,4 @@
-package com.hfad.digital_assistant
+package com.hfad.digital_assistant.view
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -7,7 +7,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
+import com.hfad.digital_assistant.R
+import com.hfad.digital_assistant.viewModel.RegistrationViewModel
+import com.hfad.digital_assistant.viewModel.RegistrationViewModelFactory
 
 class RegistrationFragment : Fragment() {
     //Добавление строк для ключей
@@ -23,6 +27,8 @@ class RegistrationFragment : Fragment() {
     private var patronymic: String = ""
     private var send: Boolean = false
 
+    lateinit var viewModel: RegistrationViewModel
+    lateinit var viewModelFactory: RegistrationViewModelFactory
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -64,6 +70,8 @@ class RegistrationFragment : Fragment() {
 //                    if (user_patronymic.isEmpty()) "Введите отчество" else null
 //            }
         }
+        viewModelFactory = RegistrationViewModelFactory()
+        viewModel = ViewModelProvider(this).get(RegistrationViewModel::class.java)
 
         return view
     }

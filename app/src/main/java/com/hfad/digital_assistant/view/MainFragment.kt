@@ -1,4 +1,4 @@
-package com.hfad.digital_assistant
+package com.hfad.digital_assistant.view
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -7,8 +7,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
+import androidx.lifecycle.ViewModelProvider
+import com.hfad.digital_assistant.viewModel.MainViewModel
+import com.hfad.digital_assistant.viewModel.MainViewModelFactory
+import com.hfad.digital_assistant.R
 
 class MainFragment : Fragment() {
+
+    lateinit var viewModel: MainViewModel
+    lateinit var viewModelFactory: MainViewModelFactory
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -31,6 +38,9 @@ class MainFragment : Fragment() {
         DOC3.setOnClickListener{
             icon3.setImageResource(R.drawable.doc_read)
         }
+
+        viewModelFactory = MainViewModelFactory()
+        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
 
         return view
     }

@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/registrationFragment"
-        android:name="com.hfad.digital_assistant.RegistrationFragment"
+        android:name="com.hfad.digital_assistant.view.RegistrationFragment"
         android:label="fragment_registration"
         tools:layout="@layout/fragment_registration">
 
@@ -35,7 +35,7 @@
 
     <fragment
         android:id="@+id/mainFragment"
-        android:name="com.hfad.digital_assistant.MainFragment"
+        android:name="com.hfad.digital_assistant.view.MainFragment"
         android:label="fragment_main"
         tools:layout="@layout/fragment_main">
         <argument
