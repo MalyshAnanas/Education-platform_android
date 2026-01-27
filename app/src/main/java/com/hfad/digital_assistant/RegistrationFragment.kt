@@ -47,17 +47,22 @@ class RegistrationFragment : Fragment() {
             val user_name = name_text.text.toString()
             val user_surname = surname_text.text.toString()
             val user_patronymic = patronymic_text.text.toString()
-
-            if (user_name.isNotEmpty() && user_surname.isNotEmpty() && user_patronymic.isNotEmpty()) {
-                view.findNavController()
-                    .navigate(R.id.action_registrationFragment_to_mainFragment)
-            } else {
-                // Показываем сообщение об ошибке
-                name_text.error = if (user_name.isEmpty()) "Введите имя" else null
-                surname_text.error = if (user_surname.isEmpty()) "Введите фамилию" else null
-                patronymic_text.error =
-                    if (user_patronymic.isEmpty()) "Введите отчество" else null
-            }
+            val action = RegistrationFragmentDirections.actionRegistrationFragmentToMainFragment(
+                userName = "Ivan",
+                userSurname = "Ivanov",
+                userPatronymic = "Ivanovich"
+            )
+            view.findNavController().navigate(action)
+//            view.findNavController()
+//                .navigate(R.id.action_registrationFragment_to_mainFragment)
+//            if (user_name.isNotEmpty() && user_surname.isNotEmpty() && user_patronymic.isNotEmpty()) {
+//            } else {
+//                // Показываем сообщение об ошибке
+//                name_text.error = if (user_name.isEmpty()) "Введите имя" else null
+//                surname_text.error = if (user_surname.isEmpty()) "Введите фамилию" else null
+//                patronymic_text.error =
+//                    if (user_patronymic.isEmpty()) "Введите отчество" else null
+//            }
         }
 
         return view

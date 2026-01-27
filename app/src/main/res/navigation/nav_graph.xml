@@ -9,10 +9,17 @@
         android:id="@+id/registrationFragment"
         android:name="com.hfad.digital_assistant.RegistrationFragment"
         android:label="fragment_registration"
-        tools:layout="@layout/fragment_registration" >
+        tools:layout="@layout/fragment_registration">
+
+        <!--Для анимации-->
         <action
             android:id="@+id/action_registrationFragment_to_mainFragment"
-            app:destination="@id/mainFragment" >
+            app:destination="@id/mainFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim">
+
             <argument
                 android:name="userName"
                 app:argType="string" />
@@ -30,16 +37,16 @@
         android:id="@+id/mainFragment"
         android:name="com.hfad.digital_assistant.MainFragment"
         android:label="fragment_main"
-        tools:layout="@layout/fragment_main" >
-    <argument
-        android:name="userName"
-        app:argType="string" />
-    <argument
-        android:name="userSurname"
-        app:argType="string" />
-    <argument
-        android:name="userPatronymic"
-        app:argType="string" />
+        tools:layout="@layout/fragment_main">
+        <argument
+            android:name="userName"
+            app:argType="string" />
+        <argument
+            android:name="userSurname"
+            app:argType="string" />
+        <argument
+            android:name="userPatronymic"
+            app:argType="string" />
     </fragment>
 
     <fragment

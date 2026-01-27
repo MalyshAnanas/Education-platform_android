@@ -7,6 +7,8 @@ import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.hfad.digital_assistant.databinding.ActivityMainBinding
 import androidx.navigation.NavController
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.setupActionBarWithNavController
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -35,6 +37,7 @@ class MainActivity : AppCompatActivity() {
                     // Скрываем на экране регистрации
                     bottomNavView.visibility = android.view.View.GONE
                 }
+
                 R.id.mainFragment,
                 R.id.routeFragment,
                 R.id.practicumFragment,
@@ -43,6 +46,7 @@ class MainActivity : AppCompatActivity() {
                     // Показываем на всех остальных экранах
                     bottomNavView.visibility = android.view.View.VISIBLE
                 }
+
                 else -> {
                     // Для остальных фрагментов скрываем (если будут добавлены новые)
                     bottomNavView.visibility = android.view.View.GONE
