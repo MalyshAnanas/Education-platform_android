@@ -1,86 +1,123 @@
 package com.hfad.digital_assistant.view
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
+import android.widget.*
+import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.findNavController
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.hfad.digital_assistant.R
+import com.hfad.digital_assistant.model.api.AuthRepository
+import com.hfad.digital_assistant.model.api.RetrofitClient
+import com.hfad.digital_assistant.model.api.UserPreferences
 import com.hfad.digital_assistant.viewModel.RegistrationViewModel
 import com.hfad.digital_assistant.viewModel.RegistrationViewModelFactory
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 class RegistrationFragment : Fragment() {
-    //Добавление строк для ключей
-    companion object {
-        val NAME_KEY = "name"
-        val SURNAME_KEY = "surname"
-        val PATRONYMIC_KEY = "patronymic"
-        val SEND_KEY = "send"
-    }
 
-    private var name: String = ""
-    private var surname: String = ""
-    private var patronymic: String = ""
-    private var send: Boolean = false
-
-    lateinit var viewModel: RegistrationViewModel
-    lateinit var viewModelFactory: RegistrationViewModelFactory
+    private lateinit var viewModel: RegistrationViewModel
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         val view = inflater.inflate(R.layout.fragment_registration, container, false)
-        val name_text = view.findViewById<EditText>(R.id.name)
-        val surname_text = view.findViewById<EditText>(R.id.surname)
-        val patronymic_text = view.findViewById<EditText>(R.id.patronymic)
-        val send_button = view.findViewById<Button>(R.id.send)
 
+        val userloginText = view.findViewById<EditText>(R.id.login)
+        val passwordText = view.findViewById<EditText>(R.id.password)
+        val emailText = view.findViewById<EditText>(R.id.email)
+        val fullNameText = view.findViewById<EditText>(R.id.full_name)
 
-        if (savedInstanceState != null) {
-            name = savedInstanceState.getString(NAME_KEY).toString()
-            surname = savedInstanceState.getString(SURNAME_KEY).toString()
-            patronymic = savedInstanceState.getString(PATRONYMIC_KEY).toString()
-            send = savedInstanceState.getBoolean(SEND_KEY)
+        val sendButton = view.findViewById<Button>(R.id.send)
+        val progressBar = view.findViewById<ProgressBar>(R.id.progressbar)
+
+        val goToLoginText = view.findViewById<TextView>(R.id.go_to_login)
+        goToLoginText.setOnClickListener {
+            findNavController().navigate(R.id.action_registrationFragment_to_loginFragment)
         }
 
-        send_button.setOnClickListener {
-            val user_name = name_text.text.toString()
-            val user_surname = surname_text.text.toString()
-            val user_patronymic = patronymic_text.text.toString()
-            val action = RegistrationFragmentDirections.actionRegistrationFragmentToMainFragment(
-                userName = "Ivan",
-                userSurname = "Ivanov",
-                userPatronymic = "Ivanovich"
-            )
-            view.findNavController().navigate(action)
-//            view.findNavController()
-//                .navigate(R.id.action_registrationFragment_to_mainFragment)
-//            if (user_name.isNotEmpty() && user_surname.isNotEmpty() && user_patronymic.isNotEmpty()) {
-//            } else {
-//                // Показываем сообщение об ошибке
-//                name_text.error = if (user_name.isEmpty()) "Введите имя" else null
-//                surname_text.error = if (user_surname.isEmpty()) "Введите фамилию" else null
-//                patronymic_text.error =
-//                    if (user_patronymic.isEmpty()) "Введите отчество" else null
-//            }
+
+        // Репозиторий
+        val userPreferences = UserPreferences(requireContext())
+        val repository = AuthRepository(
+            userPreferences = userPreferences,
+            authApiService = RetrofitClient.create(userPreferences)
+        )
+
+        val factory = RegistrationViewModelFactory(repository)
+        viewModel = ViewModelProvider(this, factory)[RegistrationViewModel::class.java]
+
+        // Слушаем результат регистрации
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.registrationResult.collectLatest { result ->
+                result?.onSuccess { userData ->
+
+                    val action =
+                        RegistrationFragmentDirections
+                            .actionRegistrationFragmentToMainFragment()
+
+                    findNavController().navigate(action)
+
+                }?.onFailure { error ->
+                    Toast.makeText(
+                        requireContext(),
+                        "Ошибка: ${error.message}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
         }
-        viewModelFactory = RegistrationViewModelFactory()
-        viewModel = ViewModelProvider(this).get(RegistrationViewModel::class.java)
+
+        // Loading state
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.isLoading.collectLatest { isLoading ->
+                progressBar.isVisible = isLoading
+                sendButton.isEnabled = !isLoading
+            }
+        }
+
+        sendButton.setOnClickListener {
+
+            val username = userloginText.text.toString().trim()
+            val password = passwordText.text.toString().trim()
+            val email = emailText.text.toString().trim()
+            val fullName = fullNameText.text.toString().trim()
+
+            var isValid = true
+
+            if (username.isEmpty()) {
+                userloginText.error = "Введите логин"
+                isValid = false
+            }
+
+            if (password.isEmpty()) {
+                passwordText.error = "Введите пароль"
+                isValid = false
+            }
+
+            if (email.isEmpty()) {
+                emailText.error = "Введите email"
+                isValid = false
+            }
+
+            if (fullName.isEmpty()) {
+                fullNameText.error = "Введите ФИО"
+                isValid = false
+            }
+
+            if (isValid) {
+                viewModel.register(username, password, email, fullName)
+            }
+        }
 
         return view
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putString(NAME_KEY, name)
-        outState.putString(SURNAME_KEY, surname)
-        outState.putString(PATRONYMIC_KEY, patronymic)
-        outState.putBoolean(SEND_KEY, send)
     }
 }

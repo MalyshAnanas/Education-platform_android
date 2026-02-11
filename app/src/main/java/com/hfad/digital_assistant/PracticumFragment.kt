@@ -24,19 +24,20 @@ class PracticumFragment : Fragment() {
         val Case4 = view.findViewById<CardView>(R.id.CardCase4)
 
         Case1.setOnClickListener {
-            Case1.setCardBackgroundColor(R.color.gray)
+            Case1.setCardBackgroundColor(R.color.gray_for_blocks)
+
             showCasePopUp("Кейс 1", "КАКОЙ-ТО ОЧЕНЬ ВАЖНЫЙ ТЕКСТ ДЛЯ КЕЙСА 1")
         }
         Case2.setOnClickListener {
-            Case2.setCardBackgroundColor(R.color.gray)
+            Case2.setCardBackgroundColor(R.color.gray_for_blocks)
             showCasePopUp("Кейс 2", "КАКОЙ-ТО ОЧЕНЬ ВАЖНЫЙ ТЕКСТ ДЛЯ КЕЙСА 2")
         }
         Case3.setOnClickListener {
-            Case3.setCardBackgroundColor(R.color.gray)
+            Case3.setCardBackgroundColor(R.color.gray_for_blocks)
             showCasePopUp("Кейс 3", "КАКОЙ-ТО ОЧЕНЬ ВАЖНЫЙ ТЕКСТ ДЛЯ КЕЙСА 3")
         }
         Case4.setOnClickListener {
-            Case4.setCardBackgroundColor(R.color.gray)
+            Case4.setCardBackgroundColor(R.color.gray_for_blocks)
             showCasePopUp("Кейс 4", "КАКОЙ-ТО ОЧЕНЬ ВАЖНЫЙ ТЕКСТ ДЛЯ КЕЙСА 4")
         }
 

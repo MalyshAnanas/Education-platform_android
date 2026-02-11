@@ -154,7 +154,7 @@
 
                 <!-- Документ 1 -->
                 <LinearLayout
-                    android:id="@+id/DocArea1"
+                    android:id="@+id/DocAreaRoute1"
                     android:layout_width="match_parent"
                     android:layout_height="75dp"
                     android:layout_marginVertical="5dp"
@@ -166,7 +166,7 @@
                     android:orientation="horizontal">
 
                     <ImageView
-                        android:id="@+id/IconRead1"
+                        android:id="@+id/IconReadRoute1"
                         android:layout_width="64dp"
                         android:layout_height="match_parent"
                         android:src="@drawable/doc_no_read" />
@@ -187,7 +187,7 @@
 
                 <!-- Документ 2 -->
                 <LinearLayout
-                    android:id="@+id/DocArea2"
+                    android:id="@+id/DocAreaRoute2"
                     android:layout_width="match_parent"
                     android:layout_height="75dp"
                     android:layout_marginVertical="5dp"
@@ -200,7 +200,7 @@
                     android:orientation="horizontal">
 
                     <ImageView
-                        android:id="@+id/IconRead2"
+                        android:id="@+id/IconReadRoute2"
                         android:layout_width="64dp"
                         android:layout_height="match_parent"
                         android:src="@drawable/doc_no_read" />
@@ -221,7 +221,7 @@
 
                 <!-- Документ 3 -->
                 <LinearLayout
-                    android:id="@+id/DocArea3"
+                    android:id="@+id/DocAreaRoute3"
                     android:layout_width="match_parent"
                     android:layout_height="75dp"
                     android:layout_marginVertical="5dp"
@@ -234,7 +234,7 @@
                     android:orientation="horizontal">
 
                     <ImageView
-                        android:id="@+id/IconRead3"
+                        android:id="@+id/IconReadRoute3"
                         android:layout_width="64dp"
                         android:layout_height="match_parent"
                         android:src="@drawable/doc_no_read" />
@@ -255,7 +255,7 @@
 
                 <!-- Документ 4 -->
                 <LinearLayout
-                    android:id="@+id/DocArea4"
+                    android:id="@+id/DocAreaRoute4"
                     android:layout_width="match_parent"
                     android:layout_height="75dp"
                     android:layout_marginVertical="5dp"
@@ -267,7 +267,7 @@
                     android:orientation="horizontal">
 
                     <ImageView
-                        android:id="@+id/IconRead4"
+                        android:id="@+id/IconReadRoute4"
                         android:layout_width="64dp"
                         android:layout_height="match_parent"
                         android:src="@drawable/doc_no_read" />

@@ -44,9 +44,9 @@ class ReflectionFragment : Fragment() {
             selectedView.setOnClickListener {
                 emojis1.forEach { otherView ->
                     if (otherView == selectedView) {
-                        otherView.alpha = 1.0f // Выбранная — яркая
-                    } else {
                         otherView.alpha = 0.2f // Остальные — 80% прозрачности
+                    } else {
+                        otherView.alpha = 1.0f // Выбранная — яркая
                     }
                 }
             }
@@ -56,9 +56,9 @@ class ReflectionFragment : Fragment() {
             selectedView.setOnClickListener {
                 emojis2.forEach { otherView ->
                     if (otherView == selectedView) {
-                        otherView.alpha = 1.0f // Выбранная — яркая
-                    } else {
                         otherView.alpha = 0.2f // Остальные — 80% прозрачности
+                    } else {
+                        otherView.alpha = 1.0f // Выбранная — яркая
                     }
                 }
             }
@@ -68,9 +68,9 @@ class ReflectionFragment : Fragment() {
             selectedView.setOnClickListener {
                 emojis3.forEach { otherView ->
                     if (otherView == selectedView) {
-                        otherView.alpha = 1.0f // Выбранная — яркая
-                    } else {
                         otherView.alpha = 0.2f // Остальные — 80% прозрачности
+                    } else {
+                        otherView.alpha = 1.0f // Выбранная — яркая
                     }
                 }
             }

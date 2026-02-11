@@ -91,11 +91,13 @@
                 app:alignmentMode="alignMargins"
                 app:layout_constraintTop_toBottomOf="@id/userNamePrac">
 
-                <androidx.cardview.widget.CardView
+                <com.google.android.material.card.MaterialCardView
                     android:id="@+id/CardCase1"
                     android:layout_width="0dp"
                     android:layout_height="180dp"
                     app:layout_columnWeight="1"
+                    app:strokeWidth="0dp"
+                    app:strokeColor="@android:color/transparent"
                     android:layout_margin="8dp"
                     app:cardCornerRadius="20dp"
                     app:cardBackgroundColor="@color/blue_for_blocks">
@@ -121,13 +123,15 @@
                         android:textColor="@color/white"
                         android:layout_marginTop="8dp"/>
                 </LinearLayout>
-                </androidx.cardview.widget.CardView>
+                </com.google.android.material.card.MaterialCardView>
 
-                <androidx.cardview.widget.CardView
+                <com.google.android.material.card.MaterialCardView
                     android:id="@+id/CardCase2"
                     android:layout_width="0dp"
                     android:layout_height="180dp"
                     app:layout_columnWeight="1"
+                    app:strokeWidth="0dp"
+                    app:strokeColor="@android:color/transparent"
                     android:layout_margin="8dp"
                     app:cardCornerRadius="20dp"
                     app:cardBackgroundColor="@color/blue_for_blocks">
@@ -153,7 +157,7 @@
                         android:textColor="@color/white"
                         android:layout_marginTop="8dp"/>
                 </LinearLayout>
-                </androidx.cardview.widget.CardView>
+                </com.google.android.material.card.MaterialCardView>
 
             </androidx.gridlayout.widget.GridLayout>
 
@@ -166,11 +170,13 @@
                 app:alignmentMode="alignMargins"
                 app:layout_constraintTop_toBottomOf="@id/line1">
 
-                <androidx.cardview.widget.CardView
+                <com.google.android.material.card.MaterialCardView
                     android:id="@+id/CardCase3"
                     android:layout_width="0dp"
                     android:layout_height="180dp"
                     app:layout_columnWeight="1"
+                    app:strokeWidth="0dp"
+                    app:strokeColor="@android:color/transparent"
                     android:layout_margin="8dp"
                     app:cardCornerRadius="20dp"
                     app:cardBackgroundColor="@color/blue_for_blocks">
@@ -196,13 +202,15 @@
                             android:textColor="@color/white"
                             android:layout_marginTop="8dp"/>
                     </LinearLayout>
-                </androidx.cardview.widget.CardView>
+                </com.google.android.material.card.MaterialCardView>
 
-                <androidx.cardview.widget.CardView
+                <com.google.android.material.card.MaterialCardView
                     android:id="@+id/CardCase4"
                     android:layout_width="0dp"
                     android:layout_height="180dp"
                     app:layout_columnWeight="1"
+                    app:strokeWidth="0dp"
+                    app:strokeColor="@android:color/transparent"
                     android:layout_margin="8dp"
                     app:cardCornerRadius="20dp"
                     app:cardBackgroundColor="@color/blue_for_blocks">
@@ -228,7 +236,7 @@
                             android:textColor="@color/white"
                             android:layout_marginTop="8dp"/>
                     </LinearLayout>
-                </androidx.cardview.widget.CardView>
+                </com.google.android.material.card.MaterialCardView>
 
             </androidx.gridlayout.widget.GridLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>

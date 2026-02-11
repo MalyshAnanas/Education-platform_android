@@ -10,21 +10,20 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 
 class RouteFragment : Fragment() {
-    @SuppressLint("MissingInflatedId")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
 
         val view = inflater.inflate(R.layout.fragment_route, container, false)
-        val DOC1 = view.findViewById<LinearLayout>(R.id.DocArea1)
-        val DOC2 = view.findViewById<LinearLayout>(R.id.DocArea2)
-        val DOC3 = view.findViewById<LinearLayout>(R.id.DocArea3)
-        val DOC4 = view.findViewById<LinearLayout>(R.id.DocArea4)
-        val icon1 = view.findViewById<ImageView>(R.id.IconRead1)
-        val icon2 = view.findViewById<ImageView>(R.id.IconRead2)
-        val icon3 = view.findViewById<ImageView>(R.id.IconRead3)
-        val icon4 = view.findViewById<ImageView>(R.id.IconRead4)
+        val DOC1 = view.findViewById<LinearLayout>(R.id.DocAreaRoute1)
+        val DOC2 = view.findViewById<LinearLayout>(R.id.DocAreaRoute2)
+        val DOC3 = view.findViewById<LinearLayout>(R.id.DocAreaRoute3)
+        val DOC4 = view.findViewById<LinearLayout>(R.id.DocAreaRoute4)
+        val icon1 = view.findViewById<ImageView>(R.id.IconReadRoute1)
+        val icon2 = view.findViewById<ImageView>(R.id.IconReadRoute2)
+        val icon3 = view.findViewById<ImageView>(R.id.IconReadRoute3)
+        val icon4 = view.findViewById<ImageView>(R.id.IconReadRoute4)
 
         DOC1.setOnClickListener{
             icon1.setImageResource(R.drawable.doc_read)

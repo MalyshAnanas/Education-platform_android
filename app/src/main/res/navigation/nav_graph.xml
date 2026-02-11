@@ -3,7 +3,33 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/registrationFragment">
+    app:startDestination="@id/splashFragment">
+
+    <fragment
+        android:id="@+id/splashFragment"
+        android:name="com.hfad.digital_assistant.view.SplashFragment"
+        android:label="fragment_splash">
+        <action
+            android:id="@+id/action_splashFragment_to_registrationFragment"
+            app:destination="@id/registrationFragment"/>
+        <action
+            android:id="@+id/action_splashFragment_to_mainFragment"
+            app:destination="@id/mainFragment"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.hfad.digital_assistant.view.LoginFragment"
+        android:label="fragment_login">
+        <action
+            android:id="@+id/action_loginFragment_to_mainFragment"
+            app:destination="@id/mainFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/mainFragment"
+        android:name="com.hfad.digital_assistant.view.MainFragment"
+        android:label="fragment_main"/>
 
     <fragment
         android:id="@+id/registrationFragment"
@@ -19,35 +45,12 @@
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim">
-
-            <argument
-                android:name="userName"
-                app:argType="string" />
-            <argument
-                android:name="userSurname"
-                app:argType="string" />
-            <argument
-                android:name="userPatronymic"
-                app:argType="string" />
         </action>
-
     </fragment>
 
-    <fragment
-        android:id="@+id/mainFragment"
-        android:name="com.hfad.digital_assistant.view.MainFragment"
-        android:label="fragment_main"
-        tools:layout="@layout/fragment_main">
-        <argument
-            android:name="userName"
-            app:argType="string" />
-        <argument
-            android:name="userSurname"
-            app:argType="string" />
-        <argument
-            android:name="userPatronymic"
-            app:argType="string" />
-    </fragment>
+    <action
+        android:id="@+id/action_registrationFragment_to_loginFragment"
+        app:destination="@id/loginFragment" />
 
     <fragment
         android:id="@+id/routeFragment"
@@ -72,5 +75,7 @@
         android:name="com.hfad.digital_assistant.ReflectionFragment"
         android:label="Reflection"
         tools:layout="@layout/fragment_reflection" />
+
+
 
 </navigation>
