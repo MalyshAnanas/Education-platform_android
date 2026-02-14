@@ -8,6 +8,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.TextView
+import com.hfad.digital_assistant.model.api.UserPreferences
+import com.hfad.digital_assistant.view.ProfileBottomSheet
 
 class RouteFragment : Fragment() {
     override fun onCreateView(
@@ -38,6 +41,23 @@ class RouteFragment : Fragment() {
             icon4.setImageResource(R.drawable.doc_read)
         }
 
-        return inflater.inflate(R.layout.fragment_route, container, false)
+        // Получаем пользователя из Preferences
+        val userPreferences = UserPreferences(requireContext())
+        val fullName = userPreferences.getFullName()
+        val userNameText = view.findViewById<TextView>(R.id.userNameRoute)
+        userNameText.text = fullName ?: "Гость"
+
+        val userPhotoContainer = view.findViewById<View>(R.id.userPhotoContainerRout)
+
+        // Открытие профиля
+        val openProfile = {
+            val bottomSheet = ProfileBottomSheet()
+            bottomSheet.show(parentFragmentManager, "ProfileBottomSheet")
+        }
+
+        userNameText.setOnClickListener { openProfile() }
+        userPhotoContainer.setOnClickListener { openProfile() }
+
+        return view
     }
 }

@@ -37,8 +37,9 @@ class UserPreferences(context: Context) {
     /* ================= AUTH ================= */
 
     fun isAuthorized(): Boolean {
-        return !prefs.getString("token", "").isNullOrEmpty()
+        return !getToken().isNullOrEmpty()
     }
+
 
     fun clear() {
         prefs.edit().clear().apply()

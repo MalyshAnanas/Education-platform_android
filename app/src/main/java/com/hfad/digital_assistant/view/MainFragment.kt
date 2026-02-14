@@ -13,6 +13,8 @@ import com.hfad.digital_assistant.R
 import com.hfad.digital_assistant.model.api.UserPreferences
 import com.hfad.digital_assistant.viewModel.MainViewModel
 import com.hfad.digital_assistant.viewModel.MainViewModelFactory
+import com.hfad.digital_assistant.view.ProfileBottomSheet
+
 
 class MainFragment : Fragment() {
 
@@ -58,6 +60,18 @@ class MainFragment : Fragment() {
         // ViewModel (если нужен)
         val factory = MainViewModelFactory()
         viewModel = ViewModelProvider(this, factory)[MainViewModel::class.java]
+
+        val userPhotoContainer = view.findViewById<View>(R.id.userPhotoContainer)
+
+        // Открытие профиля
+        val openProfile = {
+            val bottomSheet = ProfileBottomSheet()
+            bottomSheet.show(parentFragmentManager, "ProfileBottomSheet")
+        }
+
+        userNameText.setOnClickListener { openProfile() }
+        userPhotoContainer.setOnClickListener { openProfile() }
+
 
         return view
     }

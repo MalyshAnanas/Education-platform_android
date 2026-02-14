@@ -9,10 +9,12 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.hfad.digital_assistant.model.api.UserPreferences
+import com.hfad.digital_assistant.view.ProfileBottomSheet
 
 class PracticumFragment : Fragment() {
 
-    @SuppressLint("MissingInflatedId", "ResourceAsColor")
+    @SuppressLint("ResourceAsColor")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -40,6 +42,23 @@ class PracticumFragment : Fragment() {
             Case4.setCardBackgroundColor(R.color.gray_for_blocks)
             showCasePopUp("Кейс 4", "КАКОЙ-ТО ОЧЕНЬ ВАЖНЫЙ ТЕКСТ ДЛЯ КЕЙСА 4")
         }
+
+        // Получаем пользователя из Preferences
+        val userPreferences = UserPreferences(requireContext())
+        val fullName = userPreferences.getFullName()
+        val userNameText = view.findViewById<TextView>(R.id.userNamePrac)
+        userNameText.text = fullName ?: "Гость"
+
+        val userPhotoContainer = view.findViewById<View>(R.id.userPhotoContainerPrac)
+
+        // Открытие профиля
+        val openProfile = {
+            val bottomSheet = ProfileBottomSheet()
+            bottomSheet.show(parentFragmentManager, "ProfileBottomSheet")
+        }
+
+        userNameText.setOnClickListener { openProfile() }
+        userPhotoContainer.setOnClickListener { openProfile() }
 
         return view
     }
