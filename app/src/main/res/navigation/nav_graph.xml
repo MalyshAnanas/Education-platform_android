@@ -54,7 +54,7 @@
 
     <fragment
         android:id="@+id/routeFragment"
-        android:name="com.hfad.digital_assistant.RouteFragment"
+        android:name="com.hfad.digital_assistant.view.RouteFragment"
         android:label="Route"
         tools:layout="@layout/fragment_route" />
 

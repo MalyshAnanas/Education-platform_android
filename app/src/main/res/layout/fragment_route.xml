@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    tools:context=".RouteFragment">
+    tools:context=".view.RouteFragment">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -62,7 +62,7 @@
                         android:id="@+id/docsCounter1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Просмотрено: "
+                        android:text="Загружено:"
                         android:textSize="20sp"
                         android:textColor="@color/white"
                         android:fontFamily="sans-serif-medium" />
@@ -71,7 +71,16 @@
                         android:id="@+id/docsCounter3"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="0 документа"
+                        android:layout_marginStart="10dp"
+                        android:text="0"
+                        android:textSize="20sp"
+                        android:textColor="@color/white"
+                        android:fontFamily="sans-serif-medium" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:text="документа"
                         android:textSize="20sp"
                         android:textColor="@color/white"
                         android:fontFamily="sans-serif-medium" />
@@ -88,7 +97,7 @@
                         android:id="@+id/docsCounter2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Не просмотрено: "
+                        android:text="Всего:"
                         android:textSize="20sp"
                         android:textColor="@color/white"
                         android:fontFamily="sans-serif-medium" />
@@ -97,7 +106,16 @@
                         android:id="@+id/docsCounter4"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="0 документа"
+                        android:layout_marginStart="10dp"
+                        android:text="0"
+                        android:textSize="20sp"
+                        android:textColor="@color/white"
+                        android:fontFamily="sans-serif-medium" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:text="документа"
                         android:textSize="20sp"
                         android:textColor="@color/white"
                         android:fontFamily="sans-serif-medium" />
@@ -171,6 +189,7 @@
                         android:id="@+id/IconReadRoute1"
                         android:layout_width="64dp"
                         android:layout_height="match_parent"
+                        android:contentDescription="TODO"
                         android:src="@drawable/doc_no_read" />
 
                     <TextView
