@@ -265,10 +265,11 @@
                         android:scrollbars="none">
 
                         <LinearLayout
-                            android:id="@+id/routeContainer"
+                            android:id="@+id/routeContainerMain"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="vertical">
+                            android:orientation="vertical"
+                            tools:ignore="UselessParent">
 
                             <!-- Элемент 1 -->
                             <LinearLayout

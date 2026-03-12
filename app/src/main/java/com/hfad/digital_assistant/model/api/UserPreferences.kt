@@ -37,6 +37,8 @@ class UserPreferences(context: Context) {
     /* ================= AUTH ================= */
 
     fun isAuthorized(): Boolean {
+
+
         return !getToken().isNullOrEmpty()
     }
 

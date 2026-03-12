@@ -48,4 +48,22 @@ class LocalLibraryRepository(
     suspend fun replaceAll(files: List<LibraryFile>) {
         libraryDao.insertFiles(files)
     }
+
+    // Помечаем файл как загруженный
+    suspend fun markAsDownloaded(slug: String) {
+        val file = libraryDao.getFile(slug)
+        file?.let {
+            libraryDao.updateFile(it.copy(isDownloaded = true))
+        }
+    }
+
+    // Вставка одного файла
+    suspend fun insertFile(file: LibraryFile) {
+        libraryDao.insertFile(file)
+    }
+
+    // Вставка списка файлов (если понадобится)
+    suspend fun insertFiles(files: List<LibraryFile>) {
+        libraryDao.insertFiles(files)
+    }
 }

@@ -59,13 +59,10 @@ class RegistrationFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.registrationResult.collectLatest { result ->
                 result?.onSuccess { userData ->
-
                     val action =
                         RegistrationFragmentDirections
                             .actionRegistrationFragmentToMainFragment()
-
                     findNavController().navigate(action)
-
                 }?.onFailure { error ->
                     Toast.makeText(
                         requireContext(),

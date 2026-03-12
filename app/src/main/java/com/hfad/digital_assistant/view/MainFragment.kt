@@ -1,5 +1,6 @@
 package com.hfad.digital_assistant.view
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,9 +12,13 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.hfad.digital_assistant.R
 import com.hfad.digital_assistant.model.api.UserPreferences
+import com.hfad.digital_assistant.model.local.LibraryDatabase
+import com.hfad.digital_assistant.model.local.LibraryFile
 import com.hfad.digital_assistant.viewModel.MainViewModel
 import com.hfad.digital_assistant.viewModel.MainViewModelFactory
 import com.hfad.digital_assistant.view.ProfileBottomSheet
+import com.hfad.digital_assistant.viewModel.RouteViewModel
+import com.hfad.digital_assistant.viewModel.RouteViewModelFactory
 
 
 class MainFragment : Fragment() {
@@ -28,13 +33,12 @@ class MainFragment : Fragment() {
 
         val view = inflater.inflate(R.layout.fragment_main, container, false)
 
-        val doc1 = view.findViewById<LinearLayout>(R.id.DocArea1)
-        val doc2 = view.findViewById<LinearLayout>(R.id.DocArea2)
-        val doc3 = view.findViewById<LinearLayout>(R.id.DocArea3)
+        // ViewModel (если нужен)
+        val database = LibraryDatabase.getInstance(requireContext())
+        val libraryDao = database.libraryDao
 
-        val icon1 = view.findViewById<ImageView>(R.id.IconRead1)
-        val icon2 = view.findViewById<ImageView>(R.id.IconRead2)
-        val icon3 = view.findViewById<ImageView>(R.id.IconRead3)
+        val factory = MainViewModelFactory(libraryDao)
+        viewModel = ViewModelProvider(this, factory)[MainViewModel::class.java]
 
         val userNameText = view.findViewById<TextView>(R.id.userNameText)
 
@@ -42,24 +46,35 @@ class MainFragment : Fragment() {
         val userPreferences = UserPreferences(requireContext())
         val fullName = userPreferences.getFullName()
 
-        userNameText.text = fullName ?: "Гость"
+        userNameText.text = fullName
 
-        // Клики
-        doc1.setOnClickListener {
-            icon1.setImageResource(R.drawable.doc_read)
+        val docsContainer = view.findViewById<LinearLayout>(R.id.routeContainerMain)
+        // Наблюдение за данными
+
+        viewModel.libraryFiles.observe(viewLifecycleOwner) { files ->
+            docsContainer.removeAllViews()
+            files.forEach { file ->
+                val docView = inflater.inflate(R.layout.doc_item_layout, docsContainer, false)
+
+                val docName = docView.findViewById<TextView>(R.id.docName)
+                val icon = docView.findViewById<ImageView>(R.id.iconRead)
+
+                docName.text = file.title
+                icon.setImageResource(R.drawable.doc_no_read)
+
+                docView.setOnClickListener {
+                    icon.setImageResource(R.drawable.doc_read)
+                    openDocument(file)
+                }
+
+                docsContainer.addView(docView)
+            }
         }
 
-        doc2.setOnClickListener {
-            icon2.setImageResource(R.drawable.doc_read)
-        }
+        // Загрузка данных
 
-        doc3.setOnClickListener {
-            icon3.setImageResource(R.drawable.doc_read)
-        }
-
-        // ViewModel (если нужен)
-        val factory = MainViewModelFactory()
-        viewModel = ViewModelProvider(this, factory)[MainViewModel::class.java]
+        // Показываем локальные
+        viewModel.loadLocalFiles()
 
         val userPhotoContainer = view.findViewById<View>(R.id.userPhotoContainer)
 
@@ -75,4 +90,9 @@ class MainFragment : Fragment() {
 
         return view
     }
+
+    private fun openDocument(doc: LibraryFile) {
+        //TODO Сделать реализацию
+    }
+
 }

@@ -16,5 +16,7 @@ data class LibraryFile(
     val file: String, // URL или путь к файлу
     val author_name: String,
     val created_at: String, // ISO-строка
-    val category_details: List<Category> = emptyList() // Список категорий
+    val category_details: List<Category> = emptyList(), // Список категорий
+    val isDownloaded: Boolean = false, // Добавлен ли документ пользователем
+    val localPath: String? = null // Локальный путь к файлу
 )

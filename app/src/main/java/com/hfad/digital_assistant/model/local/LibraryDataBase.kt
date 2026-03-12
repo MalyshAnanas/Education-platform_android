@@ -8,7 +8,8 @@ import androidx.room.TypeConverters
 import com.hfad.digital_assistant.model.local.LibraryFile
 import com.hfad.digital_assistant.model.local.CategoryConverter
 
-@Database(entities = [LibraryFile::class], version = 1, exportSchema = false)
+@Database(entities = [LibraryFile::class],
+    version = 2, exportSchema = false)
 @TypeConverters(CategoryConverter::class)
 abstract class LibraryDatabase : RoomDatabase() {
     abstract val libraryDao: LibraryDao
@@ -23,7 +24,7 @@ abstract class LibraryDatabase : RoomDatabase() {
                     context.applicationContext,
                     LibraryDatabase::class.java,
                     "library_database"
-                ).build()
+                ).fallbackToDestructiveMigration().build()
                 INSTANCE = instance
                 instance
             }

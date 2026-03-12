@@ -12,10 +12,8 @@ class RouteViewModelFactory(
 ) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        Log.d("RouteViewModelFactory", "до if")
 
         if (modelClass.isAssignableFrom(RouteViewModel::class.java)) {
-            Log.d("RouteViewModelFactory", "после if")
             @Suppress("UNCHECKED_CAST")
             return RouteViewModel(remoteRepository, libraryDao) as T
         }
