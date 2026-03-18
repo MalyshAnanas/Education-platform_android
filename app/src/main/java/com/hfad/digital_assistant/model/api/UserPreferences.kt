@@ -47,6 +47,15 @@ class UserPreferences(context: Context) {
         prefs.edit().clear().apply()
     }
 
+    /* ================= Цели ================= */
+    fun saveGoal(goal: String) {
+        prefs.edit().putString("weekly_goal", goal).apply()
+    }
+
+    fun getGoal(): String {
+        return prefs.getString("weekly_goal", "") ?: ""
+    }
+
     companion object {
         private const val PREFS_NAME = "user_preferences"
 

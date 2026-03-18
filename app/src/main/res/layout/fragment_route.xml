@@ -167,7 +167,7 @@
                 android:layout_marginTop="10dp"
                 android:background="@drawable/blue_box"
                 android:gravity="center"
-                android:text="Загрузить"
+                android:text="@string/loading"
                 android:textColor="@color/white"
                 android:textSize="20sp"
                 android:fontFamily="sans-serif-black"

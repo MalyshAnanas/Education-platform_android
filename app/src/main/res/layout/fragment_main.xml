@@ -53,13 +53,15 @@
                 android:id="@+id/userPhotoContainer"
                 android:layout_width="96dp"
                 android:layout_height="96dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="15dp"
+                android:clickable="true"
                 app:cardCornerRadius="63dp"
                 app:cardElevation="0dp"
-                android:clickable="true"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.901"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/userNameText"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.0">
 
@@ -70,14 +72,13 @@
                     android:scaleType="centerCrop"
                     android:src="@drawable/kuromi" />
 
-        </androidx.cardview.widget.CardView>
+            </androidx.cardview.widget.CardView>
 
-            <!-- Блок Мониторинг -->
-
+            <!-- Блок Цель недели -->
             <androidx.cardview.widget.CardView
-                android:id="@+id/monitoringCard"
+                android:id="@+id/goalCard"
                 android:layout_width="0dp"
-                android:layout_height="300dp"
+                android:layout_height="wrap_content"
                 android:layout_margin="8dp"
                 app:layout_constraintTop_toBottomOf="@id/userNameText"
                 app:layout_constraintStart_toStartOf="parent"
@@ -86,146 +87,105 @@
                 app:cardElevation="0dp"
                 app:cardBackgroundColor="@android:color/white">
 
-                <RelativeLayout
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
                     android:padding="16dp">
 
+                    <!-- Заголовок -->
                     <TextView
-                        android:id="@+id/monitoringTitle"
+                        android:id="@+id/goalTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Мониторинг"
-                        android:textSize="30dp"
+                        android:text="Цель недели"
+                        android:textSize="24sp"
                         android:textColor="@color/blue_for_text"
                         android:fontFamily="sans-serif-black"
-                        android:layout_marginBottom="16dp" />
+                        android:layout_marginBottom="12dp"/>
 
-                    <!-- Контейнер для анимации горизонтального скролла -->
-                    <HorizontalScrollView
-                        android:id="@+id/monitoringScrollView"
-                        android:layout_width="match_parent"
-                        android:layout_height="200dp"
-                        android:layout_below="@id/monitoringTitle"
-                        android:scrollbars="none"
-                        android:fadingEdgeLength="50dp">
-
-                        <LinearLayout
-                            android:id="@+id/monitoringContainer"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical">
-
-                            <!-- Карточка 1 -->
-                            <androidx.cardview.widget.CardView
-                                android:id="@+id/card1"
-                                android:layout_width="198dp"
-                                android:layout_height="180dp"
-                                android:layout_marginHorizontal="8dp"
-                                app:cardBackgroundColor="@color/blue_for_blocks"
-                                app:cardCornerRadius="8dp"
-                                app:cardElevation="0dp">
-
-                                <LinearLayout
-                                    android:layout_width="200dp"
-                                    android:layout_height="match_parent"
-                                    android:gravity="center"
-                                    android:orientation="vertical"
-                                    android:padding="16dp">
-
-                                    <TextView
-                                        android:id="@+id/number1"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_marginBottom="8dp"
-                                        android:fontFamily="sans-serif-black"
-                                        android:text="0"
-                                        android:textAlignment="center"
-                                        android:textColor="@color/white"
-                                        android:textSize="48sp" />
-
-                                    <TextView
-                                        android:id="@+id/label1"
-                                        android:layout_width="185dp"
-                                        android:layout_height="56dp"
-                                        android:fontFamily="sans-serif-black"
-                                        android:maxLines="2"
-                                        android:text="обучающихся повысили оценку"
-                                        android:textAlignment="center"
-                                        android:textColor="@color/white"
-                                        android:textSize="20sp" />
-                                </LinearLayout>
-                            </androidx.cardview.widget.CardView>
-
-                            <!-- Карточка 2 -->
-                            <androidx.cardview.widget.CardView
-                                android:id="@+id/card2"
-                                android:layout_width="198dp"
-                                android:layout_height="180dp"
-                                android:layout_marginHorizontal="8dp"
-                                app:cardBackgroundColor="@color/blue_for_blocks"
-                                app:cardCornerRadius="8dp"
-                                app:cardElevation="0dp">
-
-                                <LinearLayout
-                                    android:layout_width="200dp"
-                                    android:layout_height="match_parent"
-                                    android:gravity="center"
-                                    android:orientation="vertical"
-                                    android:padding="16dp">
-
-                                    <TextView
-                                        android:id="@+id/number2"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_marginBottom="8dp"
-                                        android:fontFamily="sans-serif-black"
-                                        android:text="0"
-                                        android:textAlignment="center"
-                                        android:textColor="@color/white"
-                                        android:textSize="48sp" />
-
-                                    <TextView
-                                        android:id="@+id/label2"
-                                        android:layout_width="185dp"
-                                        android:layout_height="56dp"
-                                        android:fontFamily="sans-serif-black"
-                                        android:maxLines="2"
-                                        android:text="обучающихся повысили оценку"
-                                        android:textAlignment="center"
-                                        android:textColor="@color/white"
-                                        android:textSize="20sp" />
-                                </LinearLayout>
-                            </androidx.cardview.widget.CardView>
-
-                        </LinearLayout>
-                    </HorizontalScrollView>
-
-                    <!-- Индикатор прокрутки -->
+                    <!-- Поле + кнопка -->
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_below="@id/monitoringScrollView"
-                        android:layout_centerHorizontal="true"
-                        android:orientation="horizontal"
-                        android:layout_marginTop="8dp">
+                        android:orientation="horizontal">
 
-                        <View
-                            android:id="@+id/dot1"
-                            android:layout_width="12dp"
-                            android:layout_height="12dp"
-                            android:layout_marginHorizontal="4dp" />
+                        <!-- Кнопка -->
+                        <Button
+                            android:id="@+id/saveGoalButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="OK"
+                            android:backgroundTint="@color/blue_for_blocks"
+                            android:textColor="@android:color/white"
+                            android:paddingHorizontal="16dp"
+                            android:paddingVertical="8dp"
+                            android:layout_marginEnd="8dp"/>
 
-                        <View
-                            android:id="@+id/dot2"
-                            android:layout_width="12dp"
-                            android:layout_height="12dp"
-                            android:layout_marginHorizontal="4dp" />
-
+                        <!-- Поле ввода -->
+                        <EditText
+                            android:id="@+id/goalEditText"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFamily="sans-serif-black"
+                            android:textColor="@color/black"
+                            android:textColorHint="@color/blue_for_text"
+                            android:hint="Введите цель..."
+                            android:padding="8dp"/>
                     </LinearLayout>
 
-                </RelativeLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+
+            <!-- Блок Прогресс -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/progressCard"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                app:layout_constraintTop_toBottomOf="@id/goalCard"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="@android:color/white">
+
+                <TextView
+                    android:id="@+id/progressText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:text="Мой прогресс:"
+                    android:textSize="20sp"
+                    android:textColor="@color/blue_for_text"
+                    android:fontFamily="sans-serif-black"
+                    android:padding="16dp"/>
+
+                <TextView
+                    android:id="@+id/progressCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="150dp"
+                    android:fontFamily="sans-serif-black"
+                    android:padding="16dp"
+                    android:text="0/10"
+                    android:textColor="@color/black"
+                    android:textSize="20sp"
+                    app:layout_constraintStart_toStartOf="@id/progressText" />
+
+                <TextView
+                    android:id="@+id/progressLv"
+                    android:layout_width="108dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="200dp"
+                    android:fontFamily="sans-serif-black"
+                    android:padding="16dp"
+                    android:text="этапов"
+                    android:textColor="@color/black"
+                    android:textSize="20sp"
+                    app:layout_constraintStart_toStartOf="@id/progressCount" />
             </androidx.cardview.widget.CardView>
 
             <!-- Блок Маршрут -->
@@ -234,7 +194,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
-                app:layout_constraintTop_toBottomOf="@id/monitoringCard"
+                app:layout_constraintTop_toBottomOf="@id/progressCard"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:cardCornerRadius="12dp"
@@ -250,11 +210,31 @@
                         android:id="@+id/routeTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Маршрут"
+                        android:text="Библиотека"
                         android:textSize="30dp"
                         android:textColor="@color/blue_for_text"
                         android:fontFamily="sans-serif-black"
                         android:layout_marginBottom="16dp" />
+
+                    <TextView
+                        android:id="@+id/downloadButton"
+                        android:layout_width="180dp"
+                        android:layout_height="41dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_toEndOf="@+id/routeTitle"
+                        android:background="@drawable/blue_box"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:fontFamily="sans-serif-black"
+                        android:gravity="center"
+                        android:text="@string/loading"
+                        android:textColor="@color/white"
+                        android:textSize="20sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="@id/routeTitle" />
 
                     <!-- Контейнер для анимации вертикального скролла -->
                     <LinearLayout

@@ -11,5 +11,8 @@
     <string name="allFiles">Всего:</string>
     <string name="downloadFiles">Загружено:</string>
     <string name="document">документа</string>
+    <string name="purpose">Цели</string>
+    <string name="loading">Загрузить</string>
+    <string name="set_purpose">Поставить цель</string>
 
 </resources>

@@ -1,16 +1,27 @@
 package com.hfad.digital_assistant.view
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.provider.OpenableColumns
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.hfad.digital_assistant.R
+import com.hfad.digital_assistant.model.api.LibraryApi
+import com.hfad.digital_assistant.model.api.RemoteLibraryRepository
 import com.hfad.digital_assistant.model.api.UserPreferences
 import com.hfad.digital_assistant.model.local.LibraryDatabase
 import com.hfad.digital_assistant.model.local.LibraryFile
@@ -19,11 +30,21 @@ import com.hfad.digital_assistant.viewModel.MainViewModelFactory
 import com.hfad.digital_assistant.view.ProfileBottomSheet
 import com.hfad.digital_assistant.viewModel.RouteViewModel
 import com.hfad.digital_assistant.viewModel.RouteViewModelFactory
+import kotlinx.coroutines.launch
+import java.io.File
 
 
 class MainFragment : Fragment() {
 
     private lateinit var viewModel: MainViewModel
+    private val filePickerLauncher =
+        registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+            uri?.let {
+                handleSelectedFile(it)
+            }
+        }
+    private lateinit var userPreferences: UserPreferences
+    private lateinit var api: LibraryApi
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -33,11 +54,16 @@ class MainFragment : Fragment() {
 
         val view = inflater.inflate(R.layout.fragment_main, container, false)
 
+        // REPOSITORY И ROOM
+        userPreferences = UserPreferences(requireContext())
+        api = LibraryApi.create(userPreferences)
+        val remoteRepository = RemoteLibraryRepository(api)
+
         // ViewModel (если нужен)
         val database = LibraryDatabase.getInstance(requireContext())
         val libraryDao = database.libraryDao
 
-        val factory = MainViewModelFactory(libraryDao)
+        val factory = MainViewModelFactory(remoteRepository, libraryDao)
         viewModel = ViewModelProvider(this, factory)[MainViewModel::class.java]
 
         val userNameText = view.findViewById<TextView>(R.id.userNameText)
@@ -48,11 +74,25 @@ class MainFragment : Fragment() {
 
         userNameText.text = fullName
 
+        //Цели
+        val goalEditText = view.findViewById<EditText>(R.id.goalEditText)
+        val saveButton = view.findViewById<Button>(R.id.saveGoalButton)
+
+        // загрузка цели
+        goalEditText.setText(userPreferences.getGoal())
+
+        // сохранение
+        saveButton.setOnClickListener {
+            val goal = goalEditText.text.toString()
+            userPreferences.saveGoal(goal)
+        }
+
         val docsContainer = view.findViewById<LinearLayout>(R.id.routeContainerMain)
         // Наблюдение за данными
 
         viewModel.libraryFiles.observe(viewLifecycleOwner) { files ->
             docsContainer.removeAllViews()
+
             files.forEach { file ->
                 val docView = inflater.inflate(R.layout.doc_item_layout, docsContainer, false)
 
@@ -63,18 +103,36 @@ class MainFragment : Fragment() {
                 icon.setImageResource(R.drawable.doc_no_read)
 
                 docView.setOnClickListener {
-                    icon.setImageResource(R.drawable.doc_read)
-                    openDocument(file)
-                }
 
+                    val localPath = file.localPath
+
+                    if (!localPath.isNullOrEmpty() && File(localPath).exists()) {
+
+                        // файл уже скачан
+                        openLocalDocument(localPath)
+
+                    } else {
+                        icon.setImageResource(R.drawable.doc_read)
+
+                        Toast.makeText(requireContext(), "Скачивание документа...", Toast.LENGTH_SHORT).show()
+
+                        viewModel.downloadFile(file, requireContext()) { downloadedFile ->
+                            openLocalDocument(downloadedFile.localPath!!)
+                        }
+                    }
+                }
                 docsContainer.addView(docView)
             }
         }
 
         // Загрузка данных
 
-        // Показываем локальные
+        // 1. Сначала показываем локальные
         viewModel.loadLocalFiles()
+
+        Log.i("RouteFragment", "bibika")
+        // 2. Затем обновляем с сервера
+        viewModel.refreshFiles()
 
         val userPhotoContainer = view.findViewById<View>(R.id.userPhotoContainer)
 
@@ -91,8 +149,84 @@ class MainFragment : Fragment() {
         return view
     }
 
-    private fun openDocument(doc: LibraryFile) {
-        //TODO Сделать реализацию
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val downloadButton = view.findViewById<View>(R.id.downloadButton)
+
+        // Обработка нажатия на кнопку
+        downloadButton.setOnClickListener {
+            openFilePicker()
+        }
+    }
+
+    // Метод открытия проводника
+    private fun openFilePicker() {
+        filePickerLauncher.launch(arrayOf("*/*"))
+    }
+
+    // Обработка выбранного файла
+    private fun handleSelectedFile(uri: Uri) {
+        try {
+            // Даём приложению доступ к выбранному файлу
+            requireContext().contentResolver.takePersistableUriPermission(
+                uri,
+                Intent.FLAG_GRANT_READ_URI_PERMISSION
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        // Получаем реальное имя файла
+        val fileName = getFileName(uri) ?: "document_${System.currentTimeMillis()}"
+
+        // Вызываем ViewModel для загрузки
+        lifecycleScope.launch {
+            try {
+                viewModel.uploadFile(uri, fileName, requireContext())
+
+                Toast.makeText(requireContext(), "Файл загружен", Toast.LENGTH_SHORT).show()
+            } catch (e: Exception) {
+                Toast.makeText(requireContext(), "Ошибка загрузки", Toast.LENGTH_SHORT).show()
+                e.printStackTrace()
+            }
+        }
+    }
+
+    // Получение имени
+    private fun getFileName(uri: Uri): String {
+        var name = "file"
+
+        val cursor = requireContext().contentResolver.query(uri, null, null, null, null)
+        cursor?.use {
+            val index = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+            if (it.moveToFirst()) {
+                name = it.getString(index)
+            }
+        }
+
+        return name
+    }
+
+    // Метод открытия файла локально
+    private fun openLocalDocument(path: String) {
+
+        val file = File(path)
+
+        val uri = FileProvider.getUriForFile(
+            requireContext(),
+            "${requireContext().packageName}.provider",
+            file
+        )
+
+        val intent = Intent(Intent.ACTION_VIEW)
+        intent.setDataAndType(uri, "*/*")
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+
+        try {
+            startActivity(Intent.createChooser(intent, "Открыть документ"))
+        } catch (e: Exception) {
+            Toast.makeText(requireContext(), "Нет приложения для открытия файла", Toast.LENGTH_SHORT).show()
+        }
     }
 
 }
