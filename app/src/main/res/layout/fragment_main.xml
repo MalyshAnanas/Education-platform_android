@@ -110,18 +110,6 @@
                         android:layout_height="wrap_content"
                         android:orientation="horizontal">
 
-                        <!-- Кнопка -->
-                        <Button
-                            android:id="@+id/saveGoalButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="OK"
-                            android:backgroundTint="@color/blue_for_blocks"
-                            android:textColor="@android:color/white"
-                            android:paddingHorizontal="16dp"
-                            android:paddingVertical="8dp"
-                            android:layout_marginEnd="8dp"/>
-
                         <!-- Поле ввода -->
                         <EditText
                             android:id="@+id/goalEditText"
@@ -133,6 +121,18 @@
                             android:textColorHint="@color/blue_for_text"
                             android:hint="Введите цель..."
                             android:padding="8dp"/>
+
+                        <!-- Кнопка -->
+                        <Button
+                            android:id="@+id/saveGoalButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="OK"
+                            android:backgroundTint="@color/blue_for_blocks"
+                            android:textColor="@android:color/white"
+                            android:paddingHorizontal="16dp"
+                            android:paddingVertical="8dp"
+                            android:layout_marginEnd="8dp"/>
                     </LinearLayout>
 
                 </LinearLayout>
