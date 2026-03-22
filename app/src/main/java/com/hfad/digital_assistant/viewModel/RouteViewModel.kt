@@ -1,9 +1,7 @@
 package com.hfad.digital_assistant.viewModel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import android.util.Log
+import androidx.lifecycle.*
 import com.hfad.digital_assistant.model.api.Module
 import com.hfad.digital_assistant.model.api.RouteRepository
 import kotlinx.coroutines.launch
@@ -18,19 +16,35 @@ class RouteViewModel(
     private val _completedModules = MutableLiveData<Set<Int>>(emptySet())
     val completedModules: LiveData<Set<Int>> = _completedModules
 
+    // Загружаем модули
     fun loadModules() {
         viewModelScope.launch {
             try {
+                // 1. Загружаем модули
                 _modules.value = repository.getModules()
+
+                // 2. Загружаем локальные completed
+                _completedModules.value = repository.getCompletedModules()
+
+                // 3. Синхронизация с сервером
+                repository.syncWithServer()
+
             } catch (e: Exception) {
-                e.printStackTrace()
+                Log.e("RouteViewModel", "Ошибка загрузки", e)
             }
         }
     }
 
-    fun markCompleted(moduleId: Int) {
-        val updated = _completedModules.value?.toMutableSet() ?: mutableSetOf()
-        updated.add(moduleId)
-        _completedModules.value = updated
+    fun toggleCompleted(moduleId: Int) {
+        viewModelScope.launch {
+            repository.toggleCompleted(moduleId)
+
+            // обновляем UI из локальной БД
+            _completedModules.value = repository.getCompletedModules()
+        }
+    }
+
+    fun isCompleted(moduleId: Int): Boolean {
+        return _completedModules.value?.contains(moduleId) == true
     }
 }

@@ -1,4 +1,5 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -26,5 +27,27 @@
         android:layout_marginTop="10dp">
 
     </LinearLayout>
+
+    <Button
+        android:id="@+id/btnComplete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:backgroundTint="@null"
+        app:backgroundTint="@null"
+
+        android:background="@drawable/button_module"
+        android:text="Отметить как пройденный"
+
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        android:fontFamily="sans-serif-black"
+
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+
+        android:layout_marginTop="8dp"/>
 
 </LinearLayout>

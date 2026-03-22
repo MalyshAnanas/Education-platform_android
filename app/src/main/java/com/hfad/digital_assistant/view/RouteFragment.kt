@@ -3,9 +3,7 @@ package com.hfad.digital_assistant.view
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -14,6 +12,7 @@ import com.hfad.digital_assistant.R
 import com.hfad.digital_assistant.model.api.RouteApi
 import com.hfad.digital_assistant.model.api.RouteRepository
 import com.hfad.digital_assistant.model.api.UserPreferences
+import com.hfad.digital_assistant.model.local.RouteDatabase
 import com.hfad.digital_assistant.viewModel.RouteViewModel
 import com.hfad.digital_assistant.viewModel.RouteViewModelFactory
 
@@ -31,7 +30,11 @@ class RouteFragment : Fragment() {
 
         val userPreferences = UserPreferences(requireContext())
         val routeApi = RouteApi.RouteApiFactory.create(userPreferences)
-        val repository = RouteRepository(routeApi)
+
+        val db = RouteDatabase.getDatabase(requireContext())
+        val dao = db.moduleDao()
+
+        val repository = RouteRepository(routeApi, dao)
 
         viewModel = ViewModelProvider(
             this,
@@ -41,12 +44,10 @@ class RouteFragment : Fragment() {
         val tabLayout = view.findViewById<TabLayout>(R.id.tabLayout)
         contentContainer = view.findViewById(R.id.contentContainer)
 
-        // вкладки
         tabLayout.addTab(tabLayout.newTab().setText("Теория"))
         tabLayout.addTab(tabLayout.newTab().setText("Практика"))
         tabLayout.addTab(tabLayout.newTab().setText("Рефлексия"))
 
-        // переключение вкладок
         tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
                 when (tab.position) {
@@ -55,14 +56,16 @@ class RouteFragment : Fragment() {
                     2 -> showModules("reflection")
                 }
             }
-
             override fun onTabUnselected(tab: TabLayout.Tab) {}
             override fun onTabReselected(tab: TabLayout.Tab) {}
         })
 
-        // наблюдение за модулями
         viewModel.modules.observe(viewLifecycleOwner) {
-            showModules("theory") // стартовая вкладка
+            showModules("theory")
+        }
+
+        viewModel.completedModules.observe(viewLifecycleOwner) {
+            showModules("theory")
         }
 
         viewModel.loadModules()
@@ -70,7 +73,6 @@ class RouteFragment : Fragment() {
         return view
     }
 
-    // ГЛАВНАЯ ФУНКЦИЯ
     private fun showModules(type: String) {
 
         contentContainer.removeAllViews()
@@ -89,28 +91,40 @@ class RouteFragment : Fragment() {
 
             val title = lessonView.findViewById<TextView>(R.id.lessonTitle)
             val content = lessonView.findViewById<LinearLayout>(R.id.lessonContent)
+            val btn = lessonView.findViewById<Button>(R.id.btnComplete)
 
             title.text = module.title
             content.visibility = View.GONE
 
-            // цвет (пройден / нет)
-            val completed = viewModel.completedModules.value?.contains(module.id) == true
+            val isCompleted = viewModel.isCompleted(module.id)
+
+            btn.text = if (isCompleted) {
+                "Отметить как непройденный"
+            } else {
+                "Отметить как пройденный"
+            }
+
             title.setTextColor(
-                if (completed)
+                if (isCompleted)
                     resources.getColor(R.color.gray_for_text, null)
                 else
                     resources.getColor(R.color.blue_for_text, null)
             )
 
-            // раскрытие + отметка
+            btn.setOnClickListener {
+                viewModel.toggleCompleted(module.id)
+            }
+
+            btn.setBackgroundResource(
+                if (isCompleted) R.drawable.button_module_completed
+                else R.drawable.button_module
+            )
+
             title.setOnClickListener {
                 content.visibility =
                     if (content.visibility == View.GONE) View.VISIBLE else View.GONE
-
-                viewModel.markCompleted(module.id)
             }
 
-            // наполнение урока
             module.items.sortedBy { it.order }.forEach { item ->
 
                 when (item.type) {
@@ -130,9 +144,7 @@ class RouteFragment : Fragment() {
                         tv.setTextColor(resources.getColor(R.color.blue_for_text, null))
 
                         tv.setOnClickListener {
-                            item.library_file?.file?.let { url ->
-                                openFile(url)
-                            }
+                            item.library_file?.file?.let { openFile(it) }
                         }
 
                         content.addView(tv)
