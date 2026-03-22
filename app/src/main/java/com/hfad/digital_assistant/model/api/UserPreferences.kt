@@ -49,11 +49,15 @@ class UserPreferences(context: Context) {
 
     /* ================= Цели ================= */
     fun saveGoal(goal: String) {
-        prefs.edit().putString("weekly_goal", goal).apply()
+        prefs.edit().putString("goal", goal).apply()
     }
 
-    fun getGoal(): String {
-        return prefs.getString("weekly_goal", "") ?: ""
+    fun getGoal(): String? {
+        return prefs.getString("goal", null)
+    }
+
+    fun clearGoal() {
+        prefs.edit().remove("goal").apply()
     }
 
     companion object {

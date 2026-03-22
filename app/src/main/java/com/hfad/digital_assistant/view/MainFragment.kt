@@ -21,8 +21,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.hfad.digital_assistant.R
 import com.hfad.digital_assistant.model.api.LibraryApi
+import com.hfad.digital_assistant.model.api.RemoteCurrentRepository
 import com.hfad.digital_assistant.model.api.RemoteLibraryRepository
 import com.hfad.digital_assistant.model.api.UserPreferences
+import com.hfad.digital_assistant.model.local.CurrentApi
 import com.hfad.digital_assistant.model.local.LibraryDatabase
 import com.hfad.digital_assistant.model.local.LibraryFile
 import com.hfad.digital_assistant.viewModel.MainViewModel
@@ -56,14 +58,17 @@ class MainFragment : Fragment() {
 
         // REPOSITORY И ROOM
         userPreferences = UserPreferences(requireContext())
-        api = LibraryApi.create(userPreferences)
-        val remoteRepository = RemoteLibraryRepository(api)
+        val libraryApi = LibraryApi.create(userPreferences)
+        val currentApi = CurrentApi.create(userPreferences)
+        val remoteLibraryRepository = RemoteLibraryRepository(libraryApi)
+        val remoteCurrentRepository = RemoteCurrentRepository(currentApi)
+
 
         // ViewModel (если нужен)
         val database = LibraryDatabase.getInstance(requireContext())
         val libraryDao = database.libraryDao
 
-        val factory = MainViewModelFactory(remoteRepository, libraryDao)
+        val factory = MainViewModelFactory(remoteLibraryRepository, remoteCurrentRepository, libraryDao)
         viewModel = ViewModelProvider(this, factory)[MainViewModel::class.java]
 
         val userNameText = view.findViewById<TextView>(R.id.userNameText)
@@ -77,14 +82,43 @@ class MainFragment : Fragment() {
         //Цели
         val goalEditText = view.findViewById<EditText>(R.id.goalEditText)
         val saveButton = view.findViewById<Button>(R.id.saveGoalButton)
+        val localGoal = userPreferences.getGoal()
+        if (!localGoal.isNullOrEmpty()) {
+            goalEditText.setText(localGoal)
+        }
 
         // загрузка цели
-        goalEditText.setText(userPreferences.getGoal())
+        viewModel.loadGoalFromServer(
+            onGoalLoaded = { goal ->
+                goalEditText.setText(goal)
+                userPreferences.saveGoal(goal ?: "")
+            },
+            onQuoteLoaded = { quote ->
+                Log.d("QUOTE_DEBUG", "Quote: $quote")
+                goalEditText.setText(quote)
+            }
+        )
 
         // сохранение
         saveButton.setOnClickListener {
-            val goal = goalEditText.text.toString()
-            userPreferences.saveGoal(goal)
+            val goal = goalEditText.text.toString().trim()
+
+            if (goal.isEmpty()) {
+                // Удаляем цель
+                userPreferences.clearGoal()
+
+                viewModel.deleteGoalFromServer {
+                    Toast.makeText(requireContext(), "Цель удалена", Toast.LENGTH_SHORT).show()
+                }
+
+            } else {
+                // Сохраняем цель
+                userPreferences.saveGoal(goal)
+
+                viewModel.syncGoalToServer(goal) {
+                    Toast.makeText(requireContext(), "Цель сохранена", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
 
         val docsContainer = view.findViewById<LinearLayout>(R.id.routeContainerMain)

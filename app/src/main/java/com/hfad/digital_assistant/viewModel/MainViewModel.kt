@@ -8,6 +8,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.hfad.digital_assistant.model.api.RemoteCurrentRepository
 import com.hfad.digital_assistant.model.api.RemoteLibraryRepository
 import com.hfad.digital_assistant.model.local.LibraryDao
 import com.hfad.digital_assistant.model.local.LibraryFile
@@ -24,7 +25,8 @@ import java.io.File
 import java.io.FileOutputStream
 
 class MainViewModel(
-    private val remoteRepository: RemoteLibraryRepository,
+    private val remoteLibraryRepository: RemoteLibraryRepository,
+    private val remoteCurrentRepository: RemoteCurrentRepository,
     private val libraryDao: LibraryDao
 ): ViewModel() {
     private val localRepository = LocalLibraryRepository(libraryDao)
@@ -47,7 +49,7 @@ class MainViewModel(
         viewModelScope.launch {
             try {
                 Log.i("RouteViewModel", "до remoteFiles")
-                val remoteFiles = remoteRepository.getAllFiles() // вызываем API
+                val remoteFiles = remoteLibraryRepository.getAllFiles() // вызываем API
                 Log.i("RouteViewModel", remoteFiles.toString())
                 _libraryFiles.value = remoteFiles
                 _error.value = null
@@ -101,7 +103,7 @@ class MainViewModel(
                 val titleBody = fileName.toRequestBody("text/plain".toMediaTypeOrNull())
                 val descriptionBody = "Загружен пользователем".toRequestBody("text/plain".toMediaTypeOrNull())
 
-                val uploadedFile = remoteRepository.uploadFile(titleBody,
+                val uploadedFile = remoteLibraryRepository.uploadFile(titleBody,
                     descriptionBody, filePart)
 
                 val localFile = LibraryFile(
@@ -188,6 +190,91 @@ class MainViewModel(
 
             } catch (e: Exception) {
                 Log.e("DOWNLOAD", "Ошибка скачивания", e)
+            }
+        }
+    }
+
+    // Синхронизация с сервером для целей
+    fun syncGoalToServer(goal: String, onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            try {
+                remoteCurrentRepository.setCurrentGoal(goal)
+                onSuccess()
+            } catch (e: Exception) {
+                _error.value = e.message
+            }
+        }
+    }
+
+    fun loadGoalFromServer(
+        onGoalLoaded: (String?) -> Unit,
+        onQuoteLoaded: (String?) -> Unit
+    ) {
+        Log.d("GOAL_DEBUG", "loadGoalFromServer called")
+
+        viewModelScope.launch {
+            try {
+                val response = remoteCurrentRepository.getCurrentGoal()
+
+                Log.d("GOAL_DEBUG", "Response code: ${response.code()}")
+                Log.d("GOAL_DEBUG", "Response body: ${response.body()}")
+
+                if (response.isSuccessful) {
+
+                    // 200 - OK
+                    val goal = response.body()?.goal
+
+                    if (!goal.isNullOrBlank()) {
+                        // есть цель
+                        onGoalLoaded(goal)
+                    } else {
+                        // цель пустая => показываем цитату
+                        Log.d("GOAL_DEBUG", "Goal empty → loading quote")
+
+                        val quoteResponse = remoteCurrentRepository.getRandomQuote()
+
+                        if (quoteResponse.isSuccessful) {
+                            onQuoteLoaded(quoteResponse.body()?.text)
+                        }
+                    }
+
+                } else {
+                    // 404 или любой другой неуспешный код
+
+                    Log.d("GOAL_DEBUG", "Request failed → fallback to quote")
+
+                    val quoteResponse = remoteCurrentRepository.getRandomQuote()
+
+                    if (quoteResponse.isSuccessful) {
+                        onQuoteLoaded(quoteResponse.body()?.text)
+                    }
+                }
+
+            } catch (e: Exception) {
+                Log.e("GOAL_DEBUG", "Exception", e)
+                _error.value = e.message
+
+                //  fallback даже при ошибке сети
+                try {
+                    val quoteResponse = remoteCurrentRepository.getRandomQuote()
+
+                    if (quoteResponse.isSuccessful) {
+                        onQuoteLoaded(quoteResponse.body()?.text)
+                    }
+                } catch (ex: Exception) {
+                    Log.e("GOAL_DEBUG", "Quote fallback failed", ex)
+                }
+            }
+        }
+    }
+
+    fun deleteGoalFromServer(onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            try {
+                remoteCurrentRepository.deleteCurrentGoal()
+                onSuccess()
+            } catch (e: Exception) {
+                _error.value = e.message
             }
         }
     }
