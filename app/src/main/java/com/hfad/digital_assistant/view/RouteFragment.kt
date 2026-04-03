@@ -41,6 +41,13 @@ class RouteFragment : Fragment() {
             RouteViewModelFactory(repository)
         )[RouteViewModel::class.java]
 
+        val userNameText = view.findViewById<TextView>(R.id.userNameRoute)
+
+        // Получаем пользователя из Preferences
+        val fullName = userPreferences.getFullName()
+
+        userNameText.text = fullName
+
         val tabLayout = view.findViewById<TabLayout>(R.id.tabLayout)
         contentContainer = view.findViewById(R.id.contentContainer)
 
@@ -61,10 +68,12 @@ class RouteFragment : Fragment() {
         })
 
         viewModel.modules.observe(viewLifecycleOwner) {
+            updateCounters(view)
             showModules("theory")
         }
 
         viewModel.completedModules.observe(viewLifecycleOwner) {
+            updateCounters(view)
             showModules("theory")
         }
 
@@ -161,5 +170,39 @@ class RouteFragment : Fragment() {
     private fun openFile(url: String) {
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
         startActivity(intent)
+    }
+
+    // Функция склонения
+    private fun getModulesWord(count: Int): String {
+        val mod10 = count % 10
+        val mod100 = count % 100
+
+        return when {
+            mod10 == 1 && mod100 != 11 -> "модуль"
+            mod10 in 2..4 && mod100 !in 12..14 -> "модуля"
+            else -> "модулей"
+        }
+    }
+
+    // Обновление счётчика
+    private fun updateCounters(view: View) {
+
+        val completedCounter = view.findViewById<TextView>(R.id.downloadFilesCounter)
+        val completedText = view.findViewById<TextView>(R.id.downloadFilesDoc)
+
+        val allCounter = view.findViewById<TextView>(R.id.allFilesCounter)
+        val allText = view.findViewById<TextView>(R.id.allFilesDoc)
+
+        val allModules = viewModel.modules.value ?: emptyList()
+        val completedModules = viewModel.completedModules.value ?: emptySet()
+
+        val completedCount = completedModules.size
+        val allCount = allModules.size
+
+        completedCounter.text = completedCount.toString()
+        completedText.text = getModulesWord(completedCount)
+
+        allCounter.text = allCount.toString()
+        allText.text = getModulesWord(allCount)
     }
 }

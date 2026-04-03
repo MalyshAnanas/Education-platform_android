@@ -61,7 +61,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/downloadFiles"
+                        android:text="@string/completedModules"
                         android:textSize="20sp"
                         android:textColor="@color/white"
                         android:fontFamily="sans-serif-medium" />
@@ -80,7 +80,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="10dp"
-                        android:text="@string/document"
+                        android:text="@string/modules"
                         android:textSize="20sp"
                         android:textColor="@color/white"
                         android:fontFamily="sans-serif-medium" />
@@ -115,7 +115,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="10dp"
-                        android:text="@string/document"
+                        android:text="@string/modules"
                         android:textSize="20sp"
                         android:textColor="@color/white"
                         android:fontFamily="sans-serif-medium" />
