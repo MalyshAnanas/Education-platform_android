@@ -72,7 +72,7 @@
 
     <fragment
         android:id="@+id/reflectionFragment"
-        android:name="com.hfad.digital_assistant.ReflectionFragment"
+        android:name="com.hfad.digital_assistant.view.ReflectionFragment"
         android:label="Reflection"
         tools:layout="@layout/fragment_reflection" />
 
