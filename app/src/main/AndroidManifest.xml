@@ -15,7 +15,7 @@
 
         <activity
             android:name=".MainActivity"
-            android:windowSoftInputMode="stateHidden"
+            android:windowSoftInputMode="stateHidden|adjustPan"
             android:exported="true"
             android:theme="@style/Theme.DigitalAssistant">
             <intent-filter>
