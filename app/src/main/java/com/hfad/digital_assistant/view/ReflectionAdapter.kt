@@ -1,5 +1,6 @@
 package com.hfad.digital_assistant.view
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -61,20 +62,26 @@ class ReflectionAdapter(
         )
 
         fun bind(question: Question) {
+
             text.text = question.text
 
-            // Сброс alpha
             emojis.forEach { it.alpha = 1f }
 
             val selected = viewModel.getAnswer(question.id) as? Int
+
             if (selected != null && selected in 1..5) {
-                emojis[selected - 1].alpha = 0.2f
+                emojis[selected - 1].alpha = 0.3f
             }
 
             emojis.forEachIndexed { index, imageView ->
+
                 imageView.setOnClickListener {
+
+                    if (isReadOnly) return@setOnClickListener  // ВОТ ЭТО ГЛАВНОЕ
+
                     emojis.forEach { it.alpha = 1f }
-                    imageView.alpha = 0.2f
+                    imageView.alpha = 0.3f
+
                     viewModel.setAnswer(question.id, index + 1)
                 }
             }
@@ -86,25 +93,37 @@ class ReflectionAdapter(
 
         private val text = view.findViewById<TextView>(R.id.questionText)
         private val editText = view.findViewById<EditText>(R.id.answerInput)
+        private val textView = view.findViewById<TextView>(R.id.answerText)
 
         fun bind(question: Question) {
+
             text.text = question.text
 
-            val currentText = editText.text.toString()
-            val newText = question.answer ?: ""
-            if (currentText != newText) {
-                editText.setText(newText)
-            }
+            val answer = viewModel.getAnswer(question.id)?.toString() ?: ""
 
-            // Сохраняем фокус
-            editText.setOnFocusChangeListener { _, hasFocus ->
-                if (!hasFocus) {
-                    viewModel.setAnswer(question.id, editText.text.toString())
+            if (isReadOnly) {
+
+                editText.visibility = View.GONE
+                textView.visibility = View.VISIBLE
+
+                textView.text = if (answer.isNotEmpty()) answer else "Нет ответа"
+
+            } else {
+
+                editText.visibility = View.VISIBLE
+                textView.visibility = View.GONE
+
+                editText.isEnabled = true
+
+                if (!editText.hasFocus()) {
+                    editText.setText(answer)
                 }
-            }
 
-            editText.doAfterTextChanged {
-                viewModel.setAnswer(question.id, it.toString())
+                editText.doAfterTextChanged {
+                    if (!isReadOnly) {
+                        viewModel.setAnswer(question.id, it.toString())
+                    }
+                }
             }
         }
     }
@@ -117,7 +136,15 @@ class ReflectionAdapter(
 
         override fun areContentsTheSame(oldItem: Question, newItem: Question): Boolean {
             // Сравниваем текст и текущий ответ
-            return oldItem.text == newItem.text && oldItem.answer == newItem.answer
+            return oldItem.text == newItem.text && oldItem.user_answer == newItem.user_answer
         }
+    }
+
+    // Ставим режим "только для чтения"
+    private var isReadOnly = false
+
+    fun setReadOnly(value: Boolean) {
+        isReadOnly = value
+        notifyDataSetChanged()
     }
 }

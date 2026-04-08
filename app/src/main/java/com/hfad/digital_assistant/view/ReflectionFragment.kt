@@ -2,11 +2,11 @@ package com.hfad.digital_assistant.view
 
 import android.app.DatePickerDialog
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import android.view.LayoutInflater
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -35,10 +35,11 @@ class ReflectionFragment : Fragment() {
 
         val userPreferences = UserPreferences(requireContext())
 
-        // USER INFO
+        //  USER INFO
         val userNameText = view.findViewById<TextView>(R.id.userNameRef)
-        userNameText.text = userPreferences.getFullName()
         val userPhotoContainer = view.findViewById<View>(R.id.userPhotoContainerRef)
+
+        userNameText.text = userPreferences.getFullName()
 
         val openProfile = {
             val bottomSheet = ProfileBottomSheet()
@@ -48,7 +49,7 @@ class ReflectionFragment : Fragment() {
         userNameText.setOnClickListener { openProfile() }
         userPhotoContainer.setOnClickListener { openProfile() }
 
-        //  VIEWMODEL
+        // VIEWMODEL
         viewModel = ViewModelProvider(
             this,
             ReflectionViewModelFactory(userPreferences)
@@ -56,38 +57,98 @@ class ReflectionFragment : Fragment() {
 
         adapter = ReflectionAdapter(viewModel)
 
+        // RECYCLER
         val recycler = view.findViewById<RecyclerView>(R.id.recyclerView)
         recycler.apply {
             layoutManager = LinearLayoutManager(requireContext())
             itemAnimator = null
+            setHasFixedSize(true)
+            setItemViewCacheSize(20)
             descendantFocusability = ViewGroup.FOCUS_AFTER_DESCENDANTS
             isFocusable = false
             isFocusableInTouchMode = false
-            setHasFixedSize(true)
             adapter = this@ReflectionFragment.adapter
         }
 
-        //  LIVE DATA
+        // UI ELEMENTS
+        val btnSend = view.findViewById<Button>(R.id.btnSend)
+        val btnToday = view.findViewById<Button>(R.id.btnToday)
+        val btnPickDate = view.findViewById<Button>(R.id.btnPickDate)
+        val progress = view.findViewById<View>(R.id.progressBar)
+        val dateText = view.findViewById<TextView>(R.id.dateText)
+
+        // OBSERVERS
+
+        // список вопросов
         viewModel.questions.observe(viewLifecycleOwner) { list ->
             adapter.submitList(list)
+
+            if (list.isEmpty()) {
+                dateText.text = "Данных по этому дню нет"
+                dateText.visibility = View.VISIBLE
+            }
         }
 
-        //  BUTTONS
-        view.findViewById<Button>(R.id.btnSend).setOnClickListener {
+        // загрузка
+        viewModel.isLoading.observe(viewLifecycleOwner) {
+            progress.visibility = if (it) View.VISIBLE else View.GONE
+        }
+
+        // состояние кнопки
+        viewModel.isFormChanged.observe(viewLifecycleOwner) { changed ->
+            val isToday = viewModel.isToday.value ?: true
+
+            btnSend.isEnabled = changed && isToday
+            btnSend.alpha = if (changed && isToday) 1f else 0.5f
+        }
+
+        // режим сегодня / не сегодня
+        viewModel.isToday.observe(viewLifecycleOwner) { isToday ->
+            adapter.setReadOnly(!isToday)
+            val changed = viewModel.isFormChanged.value ?: false
+
+            btnSend.isEnabled = changed && isToday
+            btnSend.alpha = if (changed && isToday) 1f else 0.5f
+        }
+
+        // выбранная дата
+        viewModel.selectedDate.observe(viewLifecycleOwner) { date ->
+            if (date != null) {
+                dateText.visibility = View.VISIBLE
+                dateText.text = "Дата: $date"
+            } else {
+                dateText.visibility = View.GONE
+            }
+        }
+
+        // BUTTONS
+
+        btnSend.setOnClickListener {
             viewModel.sendAnswers()
+
+            // убрать фокус
+            clearFocus(requireView())
         }
 
-        view.findViewById<Button>(R.id.btnToday).setOnClickListener {
-            viewModel.loadQuestions()
+        btnToday.setOnClickListener {
+            viewModel.loadToday()
         }
 
-        view.findViewById<Button>(R.id.btnPickDate).setOnClickListener {
+        btnPickDate.setOnClickListener {
+
             val cal = Calendar.getInstance()
+
+            // фикс выбранной даты
+            viewModel.selectedDate.value?.let { date ->
+                val parts = date.split("-")
+                cal.set(parts[0].toInt(), parts[1].toInt() - 1, parts[2].toInt())
+            }
+
             DatePickerDialog(
                 requireContext(),
                 { _, y, m, d ->
                     val date = "$y-${m + 1}-$d"
-                    // TODO: сделать запрос истории по дате
+                    viewModel.loadQuestionsForDate(date)
                 },
                 cal.get(Calendar.YEAR),
                 cal.get(Calendar.MONTH),
@@ -95,7 +156,14 @@ class ReflectionFragment : Fragment() {
             ).show()
         }
 
-        //  INITIAL LOAD
+        // INIT
         viewModel.loadQuestions()
+    }
+
+    private fun clearFocus(view: View) {
+        view.clearFocus()
+        val imm = requireContext().getSystemService(android.content.Context.INPUT_METHOD_SERVICE)
+                as android.view.inputmethod.InputMethodManager
+        imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
 }

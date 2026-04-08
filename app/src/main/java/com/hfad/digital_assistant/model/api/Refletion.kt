@@ -3,8 +3,8 @@ package com.hfad.digital_assistant.model.api
 data class Question(
     val id: Int,
     val text: String,
-    val type: String, // "choice" или "text"
-    var answer: String = ""
+    val type: String,
+    val user_answer: Answer?
 )
 
 data class Answer(
