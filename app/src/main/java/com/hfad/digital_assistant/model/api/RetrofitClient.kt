@@ -6,15 +6,11 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
-
     private const val BASE_URL = "https://methodical-space.ru/"
-
     fun create(userPreferences: UserPreferences): AuthApiService {
-
         val logging = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         }
-
         val okHttpClient = OkHttpClient.Builder()
             .addInterceptor(AuthInterceptor { userPreferences.getToken() })
             .addInterceptor(logging)
@@ -25,7 +21,6 @@ object RetrofitClient {
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-
         return retrofit.create(AuthApiService::class.java)
     }
 }

@@ -60,7 +60,7 @@
 
     <fragment
         android:id="@+id/practicumFragment"
-        android:name="com.hfad.digital_assistant.PracticumFragment"
+        android:name="com.hfad.digital_assistant.view.PracticumFragment"
         android:label="Practicum"
         tools:layout="@layout/fragment_practicum" />
 

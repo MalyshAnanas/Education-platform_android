@@ -19,7 +19,7 @@
     <TextView
         android:id="@+id/title"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="80dp"
 
         android:text="Рефлексия"
         android:textColor="@color/white"
@@ -36,6 +36,7 @@
         android:id="@+id/userBlock"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:minHeight="128dp"
         android:padding="24dp"
         app:layout_constraintTop_toBottomOf="@id/blueTopRect"
         app:layout_constraintStart_toStartOf="parent"
@@ -43,14 +44,19 @@
 
         <TextView
             android:id="@+id/userNameRef"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:ellipsize="end"
+            android:maxLines="2"
             android:text="Малыш А.В."
-            android:textSize="28sp"
-            android:textStyle="bold"
+            android:textSize="25sp"
+            android:fontFamily="sans-serif-black"
             android:textColor="@color/black"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="@id/userPhotoContainerRef"
+            app:layout_constraintEnd_toStartOf="@id/userPhotoContainerRef"
+            app:layout_constraintBottom_toBottomOf="@id/userPhotoContainerRef"/>
 
         <androidx.cardview.widget.CardView
             android:id="@+id/userPhotoContainerRef"
@@ -58,7 +64,8 @@
             android:layout_height="80dp"
             app:cardCornerRadius="40dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/userNameRef">
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
 
             <ImageView
                 android:layout_width="match_parent"
