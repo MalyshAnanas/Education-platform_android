@@ -1,19 +1,24 @@
 package com.hfad.digital_assistant
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.view.View
+import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.hfad.digital_assistant.databinding.ActivityMainBinding
-import androidx.navigation.NavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupActionBarWithNavController
 
 class MainActivity : AppCompatActivity() {
+
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
     private lateinit var bottomNavView: BottomNavigationView
+    private lateinit var navHostFragment: NavHostFragment
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,21 +26,23 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        bottomNavView = binding.bottomNav
+        bottomNavView = findViewById(R.id.bottom_nav)
+        swipeRefreshLayout = findViewById(R.id.swipe_refresh)
 
-        val navHostFragment = supportFragmentManager
+        navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
 
-        // Скрываем BottomNavigationView при запуске
-        bottomNavView.visibility = android.view.View.GONE
+        setupSwipeRefresh()
 
-        // Настраиваем слушатель для изменения видимости BottomNavigationView
+        swipeRefreshLayout.isRefreshing = false
+        bottomNavView.visibility = View.GONE
+
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
                 R.id.registrationFragment -> {
-                    // Скрываем на экране регистрации
-                    bottomNavView.visibility = android.view.View.GONE
+                    bottomNavView.visibility = View.GONE
+                    swipeRefreshLayout.isEnabled = false
                 }
 
                 R.id.mainFragment,
@@ -43,18 +50,35 @@ class MainActivity : AppCompatActivity() {
                 R.id.practicumFragment,
                 R.id.monitoringFragment,
                 R.id.reflectionFragment -> {
-                    // Показываем на всех остальных экранах
-                    bottomNavView.visibility = android.view.View.VISIBLE
+                    bottomNavView.visibility = View.VISIBLE
+                    swipeRefreshLayout.isEnabled = true
                 }
 
                 else -> {
-                    // Для остальных фрагментов скрываем (если будут добавлены новые)
-                    bottomNavView.visibility = android.view.View.GONE
+                    bottomNavView.visibility = View.GONE
+                    swipeRefreshLayout.isEnabled = false
                 }
             }
         }
 
-        // Настраиваем BottomNavigationView с контроллером навигации
         bottomNavView.setupWithNavController(navController)
+    }
+
+    private fun setupSwipeRefresh() {
+        swipeRefreshLayout.setOnRefreshListener {
+            refreshCurrentScreen()
+        }
+
+        swipeRefreshLayout.setOnChildScrollUpCallback { _, _ ->
+            val currentFragment = navHostFragment.childFragmentManager.primaryNavigationFragment
+            currentFragment?.view?.canScrollVertically(-1) ?: false
+        }
+    }
+
+    private fun refreshCurrentScreen() {
+        Handler(Looper.getMainLooper()).postDelayed({
+            swipeRefreshLayout.isRefreshing = false
+            recreate()
+        }, 500)
     }
 }
