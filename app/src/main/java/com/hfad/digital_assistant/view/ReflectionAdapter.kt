@@ -1,13 +1,13 @@
 package com.hfad.digital_assistant.view
 
-import android.annotation.SuppressLint
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -22,6 +22,8 @@ class ReflectionAdapter(
     init {
         setHasStableIds(true)
     }
+
+    private var isReadOnly = false
 
     override fun getItemId(position: Int): Long {
         return getItem(position).id.toLong()
@@ -49,102 +51,97 @@ class ReflectionAdapter(
         if (holder is TextViewHolder) holder.bind(question)
     }
 
-    //  Choice ViewHolder
-    inner class ChoiceViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    fun setReadOnly(value: Boolean) {
+        isReadOnly = value
+        notifyDataSetChanged()
+    }
 
-        private val text = view.findViewById<TextView>(R.id.questionText)
+    inner class ChoiceViewHolder(private val root: View) : RecyclerView.ViewHolder(root) {
+
+        private val text = root.findViewById<TextView>(R.id.questionText)
         private val emojis = listOf(
-            view.findViewById<ImageView>(R.id.excellent),
-            view.findViewById<ImageView>(R.id.good),
-            view.findViewById<ImageView>(R.id.normal),
-            view.findViewById<ImageView>(R.id.bad),
-            view.findViewById<ImageView>(R.id.terrible)
+            root.findViewById<ImageView>(R.id.excellent),
+            root.findViewById<ImageView>(R.id.good),
+            root.findViewById<ImageView>(R.id.normal),
+            root.findViewById<ImageView>(R.id.bad),
+            root.findViewById<ImageView>(R.id.terrible)
         )
 
         fun bind(question: Question) {
-
             text.text = question.text
 
             emojis.forEach { it.alpha = 1f }
 
             val selected = viewModel.getAnswer(question.id) as? Int
-
             if (selected != null && selected in 1..5) {
                 emojis[selected - 1].alpha = 0.3f
             }
 
             emojis.forEachIndexed { index, imageView ->
-
                 imageView.setOnClickListener {
-
-                    if (isReadOnly) return@setOnClickListener  // ВОТ ЭТО ГЛАВНОЕ
+                    if (isReadOnly) return@setOnClickListener
 
                     emojis.forEach { it.alpha = 1f }
                     imageView.alpha = 0.3f
-
                     viewModel.setAnswer(question.id, index + 1)
                 }
             }
         }
     }
 
-    //  Text ViewHolder
-    inner class TextViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    inner class TextViewHolder(private val root: View) : RecyclerView.ViewHolder(root) {
 
-        private val text = view.findViewById<TextView>(R.id.questionText)
-        private val editText = view.findViewById<EditText>(R.id.answerInput)
-        private val textView = view.findViewById<TextView>(R.id.answerText)
+        private val text = root.findViewById<TextView>(R.id.questionText)
+        private val editText = root.findViewById<EditText>(R.id.answerInput)
+        private val textView = root.findViewById<TextView>(R.id.answerText)
+
+        private var textWatcher: TextWatcher? = null
 
         fun bind(question: Question) {
-
             text.text = question.text
 
-            val answer = viewModel.getAnswer(question.id)?.toString() ?: ""
+            val answer = viewModel.getAnswer(question.id)?.toString().orEmpty()
 
             if (isReadOnly) {
-
                 editText.visibility = View.GONE
                 textView.visibility = View.VISIBLE
+                textView.text = if (answer.isNotBlank()) answer else "Нет ответа"
+                return
+            }
 
-                textView.text = if (answer.isNotEmpty()) answer else "Нет ответа"
+            textView.visibility = View.GONE
+            editText.visibility = View.VISIBLE
+            editText.isEnabled = true
 
-            } else {
+            textWatcher?.let { editText.removeTextChangedListener(it) }
 
-                editText.visibility = View.VISIBLE
-                textView.visibility = View.GONE
+            if (editText.text.toString() != answer) {
+                editText.setText(answer)
+                editText.setSelection(editText.text.length)
+            }
 
-                editText.isEnabled = true
+            textWatcher = object : TextWatcher {
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
 
-                if (!editText.hasFocus()) {
-                    editText.setText(answer)
-                }
-
-                editText.doAfterTextChanged {
+                override fun afterTextChanged(s: Editable?) {
                     if (!isReadOnly) {
-                        viewModel.setAnswer(question.id, it.toString())
+                        viewModel.setAnswer(question.id, s?.toString().orEmpty())
                     }
                 }
             }
+
+            editText.addTextChangedListener(textWatcher)
         }
     }
 
-    //  DiffUtil
     class QuestionDiffCallback : DiffUtil.ItemCallback<Question>() {
         override fun areItemsTheSame(oldItem: Question, newItem: Question): Boolean {
             return oldItem.id == newItem.id
         }
 
         override fun areContentsTheSame(oldItem: Question, newItem: Question): Boolean {
-            // Сравниваем текст и текущий ответ
-            return oldItem.text == newItem.text && oldItem.user_answer == newItem.user_answer
+            return oldItem == newItem
         }
-    }
-
-    // Ставим режим "только для чтения"
-    private var isReadOnly = false
-
-    fun setReadOnly(value: Boolean) {
-        isReadOnly = value
-        notifyDataSetChanged()
     }
 }

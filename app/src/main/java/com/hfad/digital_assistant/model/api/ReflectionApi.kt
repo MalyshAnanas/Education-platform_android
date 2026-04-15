@@ -16,8 +16,11 @@ interface ReflectionApi {
     @GET("reflection/questions/")
     suspend fun getQuestions(): List<Question>
 
+    @GET("reflection/answers-history/")
+    suspend fun getAnswersHistory(): List<QuestionHistory>
+
     @POST("reflection/answer/")
-    suspend fun sendAnswers(@Body answers: List<AnswerRequest>): Response<Unit>
+    suspend fun sendAnswers(@Body request: AnswerBulkRequest): Response<List<Answer>>
 
     object ReflectionApiFactory {
 

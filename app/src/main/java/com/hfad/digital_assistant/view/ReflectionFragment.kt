@@ -2,11 +2,11 @@ package com.hfad.digital_assistant.view
 
 import android.app.DatePickerDialog
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
-import android.view.LayoutInflater
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -35,21 +35,19 @@ class ReflectionFragment : Fragment() {
 
         val userPreferences = UserPreferences(requireContext())
 
-        //  USER INFO
         val userNameText = view.findViewById<TextView>(R.id.userNameRef)
         val userPhotoContainer = view.findViewById<View>(R.id.userPhotoContainerRef)
 
-        userNameText.text = userPreferences.getFullName()
+        userNameText?.text = userPreferences.getFullName()
 
         val openProfile = {
             val bottomSheet = ProfileBottomSheet()
             bottomSheet.show(parentFragmentManager, "ProfileBottomSheet")
         }
 
-        userNameText.setOnClickListener { openProfile() }
-        userPhotoContainer.setOnClickListener { openProfile() }
+        userNameText?.setOnClickListener { openProfile() }
+        userPhotoContainer?.setOnClickListener { openProfile() }
 
-        // VIEWMODEL
         viewModel = ViewModelProvider(
             this,
             ReflectionViewModelFactory(userPreferences)
@@ -57,77 +55,78 @@ class ReflectionFragment : Fragment() {
 
         adapter = ReflectionAdapter(viewModel)
 
-        // RECYCLER
         val recycler = view.findViewById<RecyclerView>(R.id.recyclerView)
         recycler.apply {
             layoutManager = LinearLayoutManager(requireContext())
             itemAnimator = null
-            setHasFixedSize(true)
-            setItemViewCacheSize(20)
-            descendantFocusability = ViewGroup.FOCUS_AFTER_DESCENDANTS
-            isFocusable = false
-            isFocusableInTouchMode = false
+            setHasFixedSize(false)
+            isNestedScrollingEnabled = false
             adapter = this@ReflectionFragment.adapter
         }
 
-        // UI ELEMENTS
         val btnSend = view.findViewById<Button>(R.id.btnSend)
         val btnToday = view.findViewById<Button>(R.id.btnToday)
         val btnPickDate = view.findViewById<Button>(R.id.btnPickDate)
         val progress = view.findViewById<View>(R.id.progressBar)
         val dateText = view.findViewById<TextView>(R.id.dateText)
 
-        // OBSERVERS
-
-        // список вопросов
         viewModel.questions.observe(viewLifecycleOwner) { list ->
             adapter.submitList(list)
 
             if (list.isEmpty()) {
-                dateText.text = "Данных по этому дню нет"
                 dateText.visibility = View.VISIBLE
+                dateText.text = "Данных по этому дню нет"
+            } else {
+                val date = viewModel.selectedDate.value
+                if (date != null) {
+                    dateText.visibility = View.VISIBLE
+                    dateText.text = "Дата: $date"
+                } else {
+                    dateText.visibility = View.GONE
+                }
             }
+
+            updateButtonState(btnSend)
         }
 
-        // загрузка
         viewModel.isLoading.observe(viewLifecycleOwner) {
             progress.visibility = if (it) View.VISIBLE else View.GONE
         }
 
-        // состояние кнопки
-        viewModel.isFormChanged.observe(viewLifecycleOwner) { changed ->
-            val isToday = viewModel.isToday.value ?: true
-
-            btnSend.isEnabled = changed && isToday
-            btnSend.alpha = if (changed && isToday) 1f else 0.5f
+        viewModel.isEditable.observe(viewLifecycleOwner) { editable ->
+            adapter.setReadOnly(!editable)
+            updateButtonState(btnSend)
         }
 
-        // режим сегодня / не сегодня
-        viewModel.isToday.observe(viewLifecycleOwner) { isToday ->
-            adapter.setReadOnly(!isToday)
-            val changed = viewModel.isFormChanged.value ?: false
-
-            btnSend.isEnabled = changed && isToday
-            btnSend.alpha = if (changed && isToday) 1f else 0.5f
+        viewModel.buttonText.observe(viewLifecycleOwner) { text ->
+            btnSend.text = text
         }
 
-        // выбранная дата
+        viewModel.isFormChanged.observe(viewLifecycleOwner) {
+            updateButtonState(btnSend)
+        }
+
+        viewModel.isToday.observe(viewLifecycleOwner) {
+            updateButtonState(btnSend)
+        }
+
+        viewModel.hasAnswersForCurrentDay.observe(viewLifecycleOwner) {
+            updateButtonState(btnSend)
+        }
+
         viewModel.selectedDate.observe(viewLifecycleOwner) { date ->
-            if (date != null) {
+            if (viewModel.questions.value.isNullOrEmpty()) {
+                dateText.visibility = View.VISIBLE
+                dateText.text = "Данных по этому дню нет"
+            } else {
                 dateText.visibility = View.VISIBLE
                 dateText.text = "Дата: $date"
-            } else {
-                dateText.visibility = View.GONE
             }
         }
 
-        // BUTTONS
-
         btnSend.setOnClickListener {
-            viewModel.sendAnswers()
-
-            // убрать фокус
             clearFocus(requireView())
+            viewModel.onMainButtonClicked()
         }
 
         btnToday.setOnClickListener {
@@ -135,19 +134,21 @@ class ReflectionFragment : Fragment() {
         }
 
         btnPickDate.setOnClickListener {
-
             val cal = Calendar.getInstance()
 
-            // фикс выбранной даты
             viewModel.selectedDate.value?.let { date ->
                 val parts = date.split("-")
-                cal.set(parts[0].toInt(), parts[1].toInt() - 1, parts[2].toInt())
+                if (parts.size == 3) {
+                    cal.set(parts[0].toInt(), parts[1].toInt() - 1, parts[2].toInt())
+                }
             }
 
             DatePickerDialog(
                 requireContext(),
                 { _, y, m, d ->
-                    val date = "$y-${m + 1}-$d"
+                    val month = (m + 1).toString().padStart(2, '0')
+                    val day = d.toString().padStart(2, '0')
+                    val date = "$y-$month-$day"
                     viewModel.loadQuestionsForDate(date)
                 },
                 cal.get(Calendar.YEAR),
@@ -156,8 +157,25 @@ class ReflectionFragment : Fragment() {
             ).show()
         }
 
-        // INIT
         viewModel.loadQuestions()
+    }
+
+    private fun updateButtonState(btnSend: Button) {
+        val isToday = viewModel.isToday.value == true
+        val isEditable = viewModel.isEditable.value == true
+        val isChanged = viewModel.isFormChanged.value == true
+        val hasAnswers = viewModel.hasAnswersForCurrentDay.value == true
+
+        val enabled = when {
+            !isToday -> false
+            isEditable && hasAnswers -> isChanged
+            isEditable && !hasAnswers -> isChanged
+            !isEditable && hasAnswers -> true
+            else -> false
+        }
+
+        btnSend.isEnabled = enabled
+        btnSend.alpha = if (enabled) 1f else 0.5f
     }
 
     private fun clearFocus(view: View) {
