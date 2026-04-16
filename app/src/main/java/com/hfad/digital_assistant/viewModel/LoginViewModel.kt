@@ -21,9 +21,14 @@ class LoginViewModel(
     fun login(username: String, password: String) {
         viewModelScope.launch {
             _isLoading.value = true
-            val result = repository.login(username, password)
-            _loginResult.value = result
-            _isLoading.value = false
+            try {
+                val result = repository.login(username, password)
+                _loginResult.value = result
+            } catch (e: Exception) {
+                _loginResult.value = Result.failure(e)
+            } finally {
+                _isLoading.value = false
+            }
         }
     }
 }

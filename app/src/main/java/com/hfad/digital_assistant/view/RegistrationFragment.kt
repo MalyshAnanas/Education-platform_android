@@ -78,6 +78,10 @@ class RegistrationFragment : Fragment() {
             viewModel.isLoading.collectLatest { isLoading ->
                 progressBar.isVisible = isLoading
                 sendButton.isEnabled = !isLoading
+                userloginText.isEnabled = !isLoading
+                passwordText.isEnabled = !isLoading
+                emailText.isEnabled = !isLoading
+                fullNameText.isEnabled = !isLoading
             }
         }
 

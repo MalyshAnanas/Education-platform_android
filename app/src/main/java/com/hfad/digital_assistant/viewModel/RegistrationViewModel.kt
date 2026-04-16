@@ -26,24 +26,25 @@ class RegistrationViewModel(
     ) {
         viewModelScope.launch {
             _isLoading.value = true
+            try {
+                val registerResult = repository.register(
+                    username = username,
+                    password = password,
+                    email = email,
+                    fullName = fullName
+                )
 
-            // Регистрация
-            val registerResult = repository.register(
-                username = username,
-                password = password,
-                email = email,
-                fullName = fullName
-            )
-
-            if (registerResult.isSuccess) {
-                // Автологин
-                val loginResult = repository.login(username, password)
-                _registrationResult.value = loginResult
-            } else {
-                _registrationResult.value = registerResult
+                if (registerResult.isSuccess) {
+                    val loginResult = repository.login(username, password)
+                    _registrationResult.value = loginResult
+                } else {
+                    _registrationResult.value = registerResult
+                }
+            } catch (e: Exception) {
+                _registrationResult.value = Result.failure(e)
+            } finally {
+                _isLoading.value = false
             }
-
-            _isLoading.value = false
         }
     }
 }

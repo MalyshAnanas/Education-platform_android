@@ -65,6 +65,8 @@ class LoginFragment : Fragment() {
             viewModel.isLoading.collectLatest { isLoading ->
                 progressBar.isVisible = isLoading
                 loginButton.isEnabled = !isLoading
+                loginText.isEnabled = !isLoading
+                passwordText.isEnabled = !isLoading
             }
         }
 
