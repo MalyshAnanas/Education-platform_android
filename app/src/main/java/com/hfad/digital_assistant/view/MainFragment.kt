@@ -58,6 +58,7 @@ class MainFragment : Fragment() {
 
         // REPOSITORY И ROOM
         userPreferences = UserPreferences(requireContext())
+
         val libraryApi = LibraryApi.create(userPreferences)
         val currentApi = CurrentApi.create(userPreferences)
         val remoteLibraryRepository = RemoteLibraryRepository(libraryApi)
@@ -68,16 +69,25 @@ class MainFragment : Fragment() {
         val database = LibraryDatabase.getInstance(requireContext())
         val libraryDao = database.libraryDao
 
-        val factory = MainViewModelFactory(remoteLibraryRepository, remoteCurrentRepository, libraryDao)
+        val factory = MainViewModelFactory(
+            remoteLibraryRepository,
+            remoteCurrentRepository,
+            libraryDao
+        )
         viewModel = ViewModelProvider(this, factory)[MainViewModel::class.java]
 
-        val userNameText = view.findViewById<TextView>(R.id.userNameText)
+        updateUserHeader(view)
+
+        parentFragmentManager.setFragmentResultListener(
+            "profile_updated",
+            viewLifecycleOwner
+        ) { _, _ ->
+            updateUserHeader(view)
+        }
 
         // Получаем пользователя из Preferences
         val userPreferences = UserPreferences(requireContext())
         val fullName = userPreferences.getFullName()
-
-        userNameText.text = fullName
 
         //Цели
         val goalEditText = view.findViewById<EditText>(R.id.goalEditText)
@@ -168,14 +178,16 @@ class MainFragment : Fragment() {
         // 2. Затем обновляем с сервера
         viewModel.refreshFiles()
 
+        // Открытие профиля
+        val userNameText = view.findViewById<TextView>(R.id.userNameText)
         val userPhotoContainer = view.findViewById<View>(R.id.userPhotoContainer)
 
-        // Открытие профиля
         val openProfile = {
             val bottomSheet = ProfileBottomSheet()
             bottomSheet.show(parentFragmentManager, "ProfileBottomSheet")
         }
 
+        userNameText.text = fullName
         userNameText.setOnClickListener { openProfile() }
         userPhotoContainer.setOnClickListener { openProfile() }
 
@@ -260,6 +272,27 @@ class MainFragment : Fragment() {
             startActivity(Intent.createChooser(intent, "Открыть документ"))
         } catch (e: Exception) {
             Toast.makeText(requireContext(), "Нет приложения для открытия файла", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    // Для обнавления шапки пользователя на странице
+    private fun updateUserHeader(view: View) {
+        val userNameText = view.findViewById<TextView>(R.id.userNameText)
+        val userPhoto = view.findViewById<ImageView>(R.id.User_photo)
+
+        val fullName = userPreferences.getFullName()
+        val photoUriString = userPreferences.getPhotoUri()
+
+        userNameText.text = fullName ?: "Гость"
+
+        if (!photoUriString.isNullOrBlank()) {
+            try {
+                userPhoto.setImageURI(Uri.parse(photoUriString))
+            } catch (e: Exception) {
+                userPhoto.setImageResource(R.drawable.kuromi)
+            }
+        } else {
+            userPhoto.setImageResource(R.drawable.kuromi)
         }
     }
 

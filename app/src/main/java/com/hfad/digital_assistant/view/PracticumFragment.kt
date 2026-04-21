@@ -1,5 +1,6 @@
 package com.hfad.digital_assistant.view
 
+import android.net.Uri
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -8,6 +9,7 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
@@ -24,6 +26,7 @@ class PracticumFragment : Fragment() {
 
     private lateinit var viewModel: PracticumViewModel
     private lateinit var adapter: CaseAdapter
+    private lateinit var userPreferences: UserPreferences
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,7 +39,7 @@ class PracticumFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val userPreferences = UserPreferences(requireContext())
+        userPreferences = UserPreferences(requireContext())
 
         // USER INFO
         val userNameText = view.findViewById<TextView>(R.id.userNamePrac)
@@ -45,11 +48,12 @@ class PracticumFragment : Fragment() {
 
         userNameText.text = userPreferences.getFullName()
 
+        // Открытие профиля
+
         val openProfile = {
             val bottomSheet = ProfileBottomSheet()
             bottomSheet.show(parentFragmentManager, "ProfileBottomSheet")
         }
-
         userNameText.setOnClickListener { openProfile() }
         userPhotoContainer.setOnClickListener { openProfile() }
 
@@ -58,6 +62,15 @@ class PracticumFragment : Fragment() {
             this,
             PracticumViewModelFactory(userPreferences)
         )[PracticumViewModel::class.java]
+
+        updateUserHeader(view)
+
+        parentFragmentManager.setFragmentResultListener(
+            "profile_updated",
+            viewLifecycleOwner
+        ) { _, _ ->
+            updateUserHeader(view)
+        }
 
         // ADAPTER
         adapter = CaseAdapter { case ->
@@ -170,5 +183,26 @@ class PracticumFragment : Fragment() {
 
         dialog.setContentView(view)
         dialog.show()
+    }
+
+    // Для обнавления шапки пользователя на странице
+    private fun updateUserHeader(view: View) {
+        val userNameText = view.findViewById<TextView>(R.id.userNamePrac)
+        val userPhoto = view.findViewById<ImageView>(R.id.userImagePrac)
+
+        val fullName = userPreferences.getFullName()
+        val photoUriString = userPreferences.getPhotoUri()
+
+        userNameText.text = fullName ?: "Гость"
+
+        if (!photoUriString.isNullOrBlank()) {
+            try {
+                userPhoto.setImageURI(Uri.parse(photoUriString))
+            } catch (e: Exception) {
+                userPhoto.setImageResource(R.drawable.kuromi)
+            }
+        } else {
+            userPhoto.setImageResource(R.drawable.kuromi)
+        }
     }
 }

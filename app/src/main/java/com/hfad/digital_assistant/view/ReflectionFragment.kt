@@ -1,11 +1,13 @@
 package com.hfad.digital_assistant.view
 
 import android.app.DatePickerDialog
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -21,6 +23,7 @@ class ReflectionFragment : Fragment() {
 
     private lateinit var viewModel: ReflectionViewModel
     private lateinit var adapter: ReflectionAdapter
+    private lateinit var userPreferences: UserPreferences
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -33,7 +36,7 @@ class ReflectionFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val userPreferences = UserPreferences(requireContext())
+        userPreferences = UserPreferences(requireContext())
 
         val userNameText = view.findViewById<TextView>(R.id.userNameRef)
         val userPhotoContainer = view.findViewById<View>(R.id.userPhotoContainerRef)
@@ -44,14 +47,22 @@ class ReflectionFragment : Fragment() {
             val bottomSheet = ProfileBottomSheet()
             bottomSheet.show(parentFragmentManager, "ProfileBottomSheet")
         }
-
-        userNameText?.setOnClickListener { openProfile() }
-        userPhotoContainer?.setOnClickListener { openProfile() }
+        userNameText.setOnClickListener { openProfile() }
+        userPhotoContainer.setOnClickListener { openProfile() }
 
         viewModel = ViewModelProvider(
             this,
             ReflectionViewModelFactory(userPreferences)
         )[ReflectionViewModel::class.java]
+
+        updateUserHeader(view)
+
+        parentFragmentManager.setFragmentResultListener(
+            "profile_updated",
+            viewLifecycleOwner
+        ) { _, _ ->
+            updateUserHeader(view)
+        }
 
         adapter = ReflectionAdapter(viewModel)
 
@@ -183,5 +194,26 @@ class ReflectionFragment : Fragment() {
         val imm = requireContext().getSystemService(android.content.Context.INPUT_METHOD_SERVICE)
                 as android.view.inputmethod.InputMethodManager
         imm.hideSoftInputFromWindow(view.windowToken, 0)
+    }
+
+    // Для обнавления шапки пользователя на странице
+    private fun updateUserHeader(view: View) {
+        val userNameText = view.findViewById<TextView>(R.id.userNameRef)
+        val userPhoto = view.findViewById<ImageView>(R.id.userImageRef)
+
+        val fullName = userPreferences.getFullName()
+        val photoUriString = userPreferences.getPhotoUri()
+
+        userNameText.text = fullName ?: "Гость"
+
+        if (!photoUriString.isNullOrBlank()) {
+            try {
+                userPhoto.setImageURI(Uri.parse(photoUriString))
+            } catch (e: Exception) {
+                userPhoto.setImageResource(R.drawable.kuromi)
+            }
+        } else {
+            userPhoto.setImageResource(R.drawable.kuromi)
+        }
     }
 }

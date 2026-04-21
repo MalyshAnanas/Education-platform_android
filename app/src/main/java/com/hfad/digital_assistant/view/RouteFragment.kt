@@ -20,6 +20,7 @@ class RouteFragment : Fragment() {
 
     private lateinit var viewModel: RouteViewModel
     private lateinit var contentContainer: FrameLayout
+    private lateinit var userPreferences: UserPreferences
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -28,7 +29,7 @@ class RouteFragment : Fragment() {
 
         val view = inflater.inflate(R.layout.fragment_route, container, false)
 
-        val userPreferences = UserPreferences(requireContext())
+        userPreferences = UserPreferences(requireContext())
         val routeApi = RouteApi.RouteApiFactory.create(userPreferences)
 
         val db = RouteDatabase.getDatabase(requireContext())
@@ -41,12 +42,17 @@ class RouteFragment : Fragment() {
             RouteViewModelFactory(repository)
         )[RouteViewModel::class.java]
 
-        val userNameText = view.findViewById<TextView>(R.id.userNameRoute)
+        updateUserHeader(view)
+
+        parentFragmentManager.setFragmentResultListener(
+            "profile_updated",
+            viewLifecycleOwner
+        ) { _, _ ->
+            updateUserHeader(view)
+        }
 
         // Получаем пользователя из Preferences
         val fullName = userPreferences.getFullName()
-
-        userNameText.text = fullName
 
         val tabLayout = view.findViewById<TabLayout>(R.id.tabLayout)
         contentContainer = view.findViewById(R.id.contentContainer)
@@ -78,6 +84,19 @@ class RouteFragment : Fragment() {
         }
 
         viewModel.loadModules()
+
+        // Открытие профиля
+        val userNameText = view.findViewById<TextView>(R.id.userNameRoute)
+        val userPhotoContainer = view.findViewById<View>(R.id.userPhotoContainerRout)
+
+        val openProfile = {
+            val bottomSheet = ProfileBottomSheet()
+            bottomSheet.show(parentFragmentManager, "ProfileBottomSheet")
+        }
+
+        userNameText.text = fullName
+        userNameText.setOnClickListener { openProfile() }
+        userPhotoContainer.setOnClickListener { openProfile() }
 
         return view
     }
@@ -204,5 +223,26 @@ class RouteFragment : Fragment() {
 
         allCounter.text = allCount.toString()
         allText.text = getModulesWord(allCount)
+    }
+
+    // Для обнавления шапки пользователя на странице
+    private fun updateUserHeader(view: View) {
+        val userNameText = view.findViewById<TextView>(R.id.userNameRoute)
+        val userPhoto = view.findViewById<ImageView>(R.id.userImageRout)
+
+        val fullName = userPreferences.getFullName()
+        val photoUriString = userPreferences.getPhotoUri()
+
+        userNameText.text = fullName ?: "Гость"
+
+        if (!photoUriString.isNullOrBlank()) {
+            try {
+                userPhoto.setImageURI(Uri.parse(photoUriString))
+            } catch (e: Exception) {
+                userPhoto.setImageResource(R.drawable.kuromi)
+            }
+        } else {
+            userPhoto.setImageResource(R.drawable.kuromi)
+        }
     }
 }
