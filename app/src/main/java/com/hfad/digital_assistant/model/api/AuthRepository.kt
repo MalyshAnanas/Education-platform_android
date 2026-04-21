@@ -75,7 +75,10 @@ class AuthRepository(
 
                 userPreferences.saveUser(
                     fullName = fullName,
-                    username = user.username
+                    username = user.username,
+                    position = user.profile.position,
+                    organization = user.profile.organization,
+                    email = user.email
                 )
 
                 Result.success(UserData(fullName))
@@ -128,7 +131,10 @@ class AuthRepository(
 
                 userPreferences.saveUser(
                     fullName = fullName,
-                    username = user.username
+                    username = user.username,
+                    position = user.profile.position,
+                    organization = user.profile.organization,
+                    email = user.email
                 )
 
                 Result.success(UserData(fullName))
@@ -169,4 +175,84 @@ class AuthRepository(
             }
         }
 
+    /** Обновление профиля */
+    suspend fun updateProfile(
+        fullName: String,
+        position: String,
+        organization: String
+    ): Result<UserData> =
+        withContext(Dispatchers.IO) {
+            try {
+                val response = authApiService.updateMe(
+                    UpdateUserRequest(
+                        profile = UpdateProfileRequest(
+                            full_name = fullName,
+                            position = position,
+                            organization = organization
+                        )
+                    )
+                )
+
+                if (!response.isSuccessful) {
+                    return@withContext Result.failure(
+                        Exception("Не удалось обновить профиль")
+                    )
+                }
+
+                val user = response.body()
+                    ?: return@withContext Result.failure(
+                        Exception("Пустой ответ сервера")
+                    )
+
+                val actualFullName = user.profile.full_name ?: user.username
+
+                userPreferences.saveUser(
+                    fullName = actualFullName,
+                    username = user.username,
+                    position = user.profile.position,
+                    organization = user.profile.organization,
+                    email = user.email
+                )
+
+                Result.success(UserData(actualFullName))
+
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+
+
+    /** Метод загрузки профиля */
+    suspend fun getProfile(): Result<UserDto> =
+        withContext(Dispatchers.IO) {
+            try {
+                val response = authApiService.getMe()
+
+                if (!response.isSuccessful) {
+                    return@withContext Result.failure(
+                        Exception("Не удалось получить профиль")
+                    )
+                }
+
+                val user = response.body()
+                    ?: return@withContext Result.failure(
+                        Exception("Пустой профиль пользователя")
+                    )
+
+                val fullName = user.profile.full_name ?: user.username
+
+                userPreferences.saveUser(
+                    fullName = fullName,
+                    username = user.username,
+                    position = user.profile.position,
+                    organization = user.profile.organization,
+                    email = user.email
+                )
+
+                Result.success(user)
+
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
 }

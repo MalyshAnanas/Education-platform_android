@@ -1,20 +1,11 @@
 package com.hfad.digital_assistant.model.api
 
-import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
-import retrofit2.http.Field
-import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 
-//это «план» того, как мобильное приложение будет общаться с сервером.
-
-/**
- * Интерфейс для взаимодействия с API аутентификации и получения данных.
- * Определяет методы для выполнения HTTP-запросов, таких, как получение страницы входа,
- * аутентификация пользователя и получение страницы статистики посещений.
- */
 interface AuthApiService {
 
     /**
@@ -27,6 +18,16 @@ interface AuthApiService {
     suspend fun login(
         @Body request: LoginRequest
     ): Response<LoginResponse>
+
+    /**
+     * Регистрация
+     * POST /api/users/register/
+     * Тело запроса: JSON { username, password, email, full_name }
+     */
+    @POST("/api/users/register/")
+    suspend fun register(
+        @Body request: RegisterRequest
+    ): Response<UserDto>
 
     /**
      * Выход из системы
@@ -43,10 +44,12 @@ interface AuthApiService {
     @GET("/api/users/me/")
     suspend fun getMe(): Response<UserDto>
 
-    @POST("/api/users/register/")
-    suspend fun register(
-        @Body request: RegisterRequest
+    /**
+     * Обновление данных профиля текущего пользователя
+     * PATCH /api/users/me/
+     */
+    @PATCH("/api/users/me/")
+    suspend fun updateMe(
+        @Body body: UpdateUserRequest
     ): Response<UserDto>
-
-
 }

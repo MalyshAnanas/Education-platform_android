@@ -10,5 +10,7 @@ data class UserDto(
 data class ProfileDto(
     val full_name: String?,
     val position: String?,
-    val organization: String?
+    val organization: String?,
+    val photo: String?,
+    val favorites: List<String> = emptyList()
 )
