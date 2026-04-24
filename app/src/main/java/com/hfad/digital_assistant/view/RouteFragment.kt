@@ -241,8 +241,8 @@ class RouteFragment : Fragment() {
             !serverPhotoUrl.isNullOrBlank() -> {
                 // Если используешь Coil:
                 userPhoto.load(serverPhotoUrl) {
-                    placeholder(R.drawable.kuromi)
-                    error(R.drawable.kuromi)
+                    placeholder(R.drawable.userPhoto)
+                    error(R.drawable.userPhoto)
                 }
             }
 
@@ -251,7 +251,7 @@ class RouteFragment : Fragment() {
             }
 
             else -> {
-                userPhoto.setImageResource(R.drawable.kuromi)
+                userPhoto.setImageResource(R.drawable.userPhoto)
             }
         }
     }

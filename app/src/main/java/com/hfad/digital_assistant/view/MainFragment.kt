@@ -26,12 +26,8 @@ import com.hfad.digital_assistant.model.api.RemoteLibraryRepository
 import com.hfad.digital_assistant.model.api.UserPreferences
 import com.hfad.digital_assistant.model.local.CurrentApi
 import com.hfad.digital_assistant.model.local.LibraryDatabase
-import com.hfad.digital_assistant.model.local.LibraryFile
 import com.hfad.digital_assistant.viewModel.MainViewModel
 import com.hfad.digital_assistant.viewModel.MainViewModelFactory
-import com.hfad.digital_assistant.view.ProfileBottomSheet
-import com.hfad.digital_assistant.viewModel.RouteViewModel
-import com.hfad.digital_assistant.viewModel.RouteViewModelFactory
 import kotlinx.coroutines.launch
 import java.io.File
 import coil.load
@@ -291,8 +287,8 @@ class MainFragment : Fragment() {
             !serverPhotoUrl.isNullOrBlank() -> {
                 // Если используешь Coil:
                 userPhoto.load(serverPhotoUrl) {
-                    placeholder(R.drawable.kuromi)
-                    error(R.drawable.kuromi)
+                    placeholder(R.drawable.userPhoto)
+                    error(R.drawable.userPhoto)
                 }
             }
 
@@ -301,7 +297,7 @@ class MainFragment : Fragment() {
             }
 
             else -> {
-                userPhoto.setImageResource(R.drawable.kuromi)
+                userPhoto.setImageResource(R.drawable.userPhoto)
             }
         }
     }

@@ -83,7 +83,7 @@
                         android:id="@+id/userImageRef"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:src="@drawable/kuromi"
+                        android:src="@drawable/userPhoto"
                         android:scaleType="centerCrop"/>
                 </androidx.cardview.widget.CardView>
 
