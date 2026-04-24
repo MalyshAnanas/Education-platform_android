@@ -1,5 +1,7 @@
 package com.hfad.digital_assistant.viewModel
 
+import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -93,6 +95,39 @@ class ProfileViewModel(
         viewModelScope.launch {
             authRepository.logout()
             _logoutEvent.value = Unit
+        }
+    }
+
+    fun uploadPhoto(context: Context, uri: Uri) {
+        userPreferences.savePhotoUri(uri.toString())
+
+        _uiState.value = _uiState.value?.copy(
+            photoUri = uri.toString(),
+            isLoading = true
+        )
+
+        viewModelScope.launch {
+            val result = authRepository.updatePhoto(context, uri)
+
+            result.onSuccess { user ->
+                val serverPhoto = user.profile.photo
+
+                userPreferences.saveServerPhotoUrl(serverPhoto)
+
+                _uiState.value = _uiState.value?.copy(
+                    photoUri = serverPhoto ?: uri.toString(),
+                    isLoading = false
+                )
+
+                _message.value = "Фото обновлено"
+            }.onFailure {
+                _uiState.value = _uiState.value?.copy(
+                    photoUri = uri.toString(),
+                    isLoading = false
+                )
+
+                _message.value = "Фото сохранено локально, но не загрузилось на сервер"
+            }
         }
     }
 }

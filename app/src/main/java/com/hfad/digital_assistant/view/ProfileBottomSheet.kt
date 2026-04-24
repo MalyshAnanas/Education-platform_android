@@ -49,11 +49,21 @@ class ProfileBottomSheet : BottomSheetDialogFragment() {
                     )
 
                     userPhotoProfile.setImageURI(selectedUri)
-                    viewModel.savePhotoLocally(selectedUri.toString())
+
+                    viewModel.uploadPhoto(
+                        context = requireContext(),
+                        uri = selectedUri
+                    )
+
+                    parentFragmentManager.setFragmentResult(
+                        "profile_updated",
+                        Bundle()
+                    )
+
                 } catch (e: Exception) {
                     Toast.makeText(
                         requireContext(),
-                        "Не удалось сохранить фото",
+                        "Не удалось выбрать фото",
                         Toast.LENGTH_SHORT
                     ).show()
                 }

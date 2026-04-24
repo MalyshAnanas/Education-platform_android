@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
 import com.hfad.digital_assistant.R
 import com.hfad.digital_assistant.model.api.UserPreferences
 import com.hfad.digital_assistant.viewModel.ReflectionViewModel
@@ -202,18 +203,27 @@ class ReflectionFragment : Fragment() {
         val userPhoto = view.findViewById<ImageView>(R.id.userImageRef)
 
         val fullName = userPreferences.getFullName()
-        val photoUriString = userPreferences.getPhotoUri()
+        val serverPhotoUrl = userPreferences.getServerPhotoUrl()
+        val localPhotoUri = userPreferences.getPhotoUri()
 
         userNameText.text = fullName ?: "Гость"
 
-        if (!photoUriString.isNullOrBlank()) {
-            try {
-                userPhoto.setImageURI(Uri.parse(photoUriString))
-            } catch (e: Exception) {
+        when {
+            !serverPhotoUrl.isNullOrBlank() -> {
+                // Если используешь Coil:
+                userPhoto.load(serverPhotoUrl) {
+                    placeholder(R.drawable.kuromi)
+                    error(R.drawable.kuromi)
+                }
+            }
+
+            !localPhotoUri.isNullOrBlank() -> {
+                userPhoto.setImageURI(Uri.parse(localPhotoUri))
+            }
+
+            else -> {
                 userPhoto.setImageResource(R.drawable.kuromi)
             }
-        } else {
-            userPhoto.setImageResource(R.drawable.kuromi)
         }
     }
 }

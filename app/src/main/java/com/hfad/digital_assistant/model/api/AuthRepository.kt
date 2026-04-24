@@ -4,6 +4,11 @@ import android.util.Log
 import com.hfad.digital_assistant.model.UserData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import android.content.Context
+import android.net.Uri
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
 
 class AuthRepository(
     private val userPreferences: UserPreferences,
@@ -81,6 +86,8 @@ class AuthRepository(
                     email = user.email
                 )
 
+                userPreferences.saveServerPhotoUrl(user.profile.photo)
+
                 Result.success(UserData(fullName))
 
             } catch (e: Exception) {
@@ -136,6 +143,8 @@ class AuthRepository(
                     organization = user.profile.organization,
                     email = user.email
                 )
+
+                userPreferences.saveServerPhotoUrl(user.profile.photo)
 
                 Result.success(UserData(fullName))
 
@@ -214,6 +223,8 @@ class AuthRepository(
                     email = user.email
                 )
 
+                userPreferences.saveServerPhotoUrl(user.profile.photo)
+
                 Result.success(UserData(actualFullName))
 
             } catch (e: Exception) {
@@ -248,6 +259,48 @@ class AuthRepository(
                     organization = user.profile.organization,
                     email = user.email
                 )
+
+                userPreferences.saveServerPhotoUrl(user.profile.photo)
+
+                Result.success(user)
+
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+
+    /** Метод загрузки фото на сервер */
+    suspend fun updatePhoto(
+        context: Context,
+        uri: Uri
+    ): Result<UserDto> =
+        withContext(Dispatchers.IO) {
+            try {
+                val inputStream = context.contentResolver.openInputStream(uri)
+                    ?: return@withContext Result.failure(Exception("Не удалось открыть фото"))
+
+                val bytes = inputStream.use { it.readBytes() }
+
+                val requestBody = bytes.toRequestBody("image/*".toMediaTypeOrNull())
+
+                val photoPart = MultipartBody.Part.createFormData(
+                    name = "photo",
+                    filename = "profile_photo_${System.currentTimeMillis()}.jpg",
+                    body = requestBody
+                )
+
+                val response = authApiService.updatePhoto(photoPart)
+
+                if (!response.isSuccessful) {
+                    return@withContext Result.failure(
+                        Exception("Не удалось загрузить фото на сервер")
+                    )
+                }
+
+                val user = response.body()
+                    ?: return@withContext Result.failure(Exception("Пустой ответ сервера"))
+
+                userPreferences.saveServerPhotoUrl(user.profile.photo)
 
                 Result.success(user)
 

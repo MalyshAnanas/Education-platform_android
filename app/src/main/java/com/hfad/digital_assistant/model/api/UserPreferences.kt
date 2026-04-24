@@ -86,6 +86,16 @@ class UserPreferences(context: Context) {
         prefs.edit().remove("goal").apply()
     }
 
+    // для отправки на сервер фото
+    fun saveServerPhotoUrl(url: String?) {
+        prefs.edit()
+            .putString(KEY_SERVER_PHOTO_URL, url)
+            .apply()
+    }
+
+    fun getServerPhotoUrl(): String? =
+        prefs.getString(KEY_SERVER_PHOTO_URL, null)
+
     companion object {
         private const val PREFS_NAME = "user_preferences"
 
@@ -96,5 +106,6 @@ class UserPreferences(context: Context) {
         private const val KEY_ORGANIZATION = "organization"
         private const val KEY_EMAIL = "email"
         private const val KEY_PHOTO_URI = "photo_uri"
+        private const val KEY_SERVER_PHOTO_URL = "server_photo_url"
     }
 }

@@ -1,10 +1,13 @@
 package com.hfad.digital_assistant.model.api
 
+import okhttp3.MultipartBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.Multipart
 import retrofit2.http.PATCH
 import retrofit2.http.POST
+import retrofit2.http.Part
 
 interface AuthApiService {
 
@@ -51,5 +54,15 @@ interface AuthApiService {
     @PATCH("/api/users/me/")
     suspend fun updateMe(
         @Body body: UpdateUserRequest
+    ): Response<UserDto>
+
+    /**
+     * Обновление фотографии пользователя
+     * PATCH /api/users/me/photo/
+     */
+    @Multipart
+    @PATCH("/api/users/me/photo/")
+    suspend fun updatePhoto(
+        @Part photo: MultipartBody.Part
     ): Response<UserDto>
 }

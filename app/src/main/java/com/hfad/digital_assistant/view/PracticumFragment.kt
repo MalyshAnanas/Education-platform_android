@@ -14,6 +14,7 @@ import android.widget.TextView
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.hfad.digital_assistant.R
 import com.hfad.digital_assistant.model.api.CaseUiStatus
@@ -191,18 +192,27 @@ class PracticumFragment : Fragment() {
         val userPhoto = view.findViewById<ImageView>(R.id.userImagePrac)
 
         val fullName = userPreferences.getFullName()
-        val photoUriString = userPreferences.getPhotoUri()
+        val serverPhotoUrl = userPreferences.getServerPhotoUrl()
+        val localPhotoUri = userPreferences.getPhotoUri()
 
         userNameText.text = fullName ?: "Гость"
 
-        if (!photoUriString.isNullOrBlank()) {
-            try {
-                userPhoto.setImageURI(Uri.parse(photoUriString))
-            } catch (e: Exception) {
+        when {
+            !serverPhotoUrl.isNullOrBlank() -> {
+                // Если используешь Coil:
+                userPhoto.load(serverPhotoUrl) {
+                    placeholder(R.drawable.kuromi)
+                    error(R.drawable.kuromi)
+                }
+            }
+
+            !localPhotoUri.isNullOrBlank() -> {
+                userPhoto.setImageURI(Uri.parse(localPhotoUri))
+            }
+
+            else -> {
                 userPhoto.setImageResource(R.drawable.kuromi)
             }
-        } else {
-            userPhoto.setImageResource(R.drawable.kuromi)
         }
     }
 }
