@@ -201,8 +201,8 @@ class PracticumFragment : Fragment() {
             !serverPhotoUrl.isNullOrBlank() -> {
                 // Если используешь Coil:
                 userPhoto.load(serverPhotoUrl) {
-                    placeholder(R.drawable.userPhoto)
-                    error(R.drawable.userPhoto)
+                    placeholder(R.drawable.userphoto)
+                    error(R.drawable.userphoto)
                 }
             }
 
@@ -211,7 +211,7 @@ class PracticumFragment : Fragment() {
             }
 
             else -> {
-                userPhoto.setImageResource(R.drawable.userPhoto)
+                userPhoto.setImageResource(R.drawable.userphoto)
             }
         }
     }
