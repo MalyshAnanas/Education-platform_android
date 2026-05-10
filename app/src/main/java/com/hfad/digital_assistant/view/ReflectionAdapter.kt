@@ -59,7 +59,8 @@ class ReflectionAdapter(
     inner class ChoiceViewHolder(private val root: View) : RecyclerView.ViewHolder(root) {
 
         private val text = root.findViewById<TextView>(R.id.questionText)
-        private val emojis = listOf(
+
+        private val emojiViews = listOf(
             root.findViewById<ImageView>(R.id.excellent),
             root.findViewById<ImageView>(R.id.good),
             root.findViewById<ImageView>(R.id.normal),
@@ -67,24 +68,76 @@ class ReflectionAdapter(
             root.findViewById<ImageView>(R.id.terrible)
         )
 
+        private val emojiValues = mapOf(
+            R.id.excellent to 5,
+            R.id.good to 4,
+            R.id.normal to 3,
+            R.id.bad to 2,
+            R.id.terrible to 1
+        )
+
         fun bind(question: Question) {
             text.text = question.text
 
-            emojis.forEach { it.alpha = 1f }
-
             val selected = viewModel.getAnswer(question.id) as? Int
-            if (selected != null && selected in 1..5) {
-                emojis[selected - 1].alpha = 0.3f
-            }
 
-            emojis.forEachIndexed { index, imageView ->
+            updateEmojiSelection(selected)
+
+            emojiViews.forEach { imageView ->
                 imageView.setOnClickListener {
                     if (isReadOnly) return@setOnClickListener
 
-                    emojis.forEach { it.alpha = 1f }
-                    imageView.alpha = 0.3f
-                    viewModel.setAnswer(question.id, index + 1)
+                    val value = emojiValues[imageView.id] ?: return@setOnClickListener
+
+                    viewModel.setAnswer(question.id, value)
+                    updateEmojiSelection(value)
                 }
+            }
+        }
+
+        private fun updateEmojiSelection(selectedValue: Int?) {
+            emojiViews.forEach { imageView ->
+                val value = emojiValues[imageView.id]
+
+                when {
+                    selectedValue == null -> {
+                        imageView.alpha = 1f
+                        imageView.setBackgroundResource(android.R.color.transparent)
+                        imageView.animate()
+                            .scaleX(1f)
+                            .scaleY(1f)
+                            .setDuration(120)
+                            .start()
+                        imageView.elevation = 0f
+                        imageView.isSelected = false
+                    }
+
+                    value == selectedValue -> {
+                        imageView.alpha = 1f
+                        imageView.setBackgroundResource(R.drawable.emoji_selected_background)
+                        imageView.animate()
+                            .scaleX(1.08f)
+                            .scaleY(1.08f)
+                            .setDuration(120)
+                            .start()
+                        imageView.elevation = 8f
+                        imageView.isSelected = true
+                    }
+
+                    else -> {
+                        imageView.alpha = 0.35f
+                        imageView.setBackgroundResource(android.R.color.transparent)
+                        imageView.animate()
+                            .scaleX(1f)
+                            .scaleY(1f)
+                            .setDuration(120)
+                            .start()
+                        imageView.elevation = 0f
+                        imageView.isSelected = false
+                    }
+                }
+
+                imageView.isEnabled = !isReadOnly
             }
         }
     }

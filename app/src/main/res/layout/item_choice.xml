@@ -38,37 +38,42 @@
 
             <ImageView
                 android:id="@+id/excellent"
-                android:layout_width="55dp"
-                android:layout_height="55dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:layout_margin="4dp"
+                android:padding="6dp"
                 android:src="@drawable/exelmark"/>
 
             <ImageView
                 android:id="@+id/good"
-                android:layout_width="55dp"
-                android:layout_height="55dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:layout_margin="4dp"
+                android:padding="6dp"
                 android:src="@drawable/goodmark"/>
 
             <ImageView
                 android:id="@+id/normal"
-                android:layout_width="55dp"
-                android:layout_height="55dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:layout_margin="4dp"
+                android:padding="6dp"
                 android:src="@drawable/normmark"/>
 
             <ImageView
                 android:id="@+id/bad"
-                android:layout_width="55dp"
-                android:layout_height="55dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:layout_margin="4dp"
+                android:padding="6dp"
                 android:src="@drawable/badmark"/>
 
             <ImageView
                 android:id="@+id/terrible"
-                android:layout_width="55dp"
-                android:layout_height="55dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:layout_margin="4dp"
+                android:padding="6dp"
                 android:src="@drawable/terrmark"/>
 
         </LinearLayout>
