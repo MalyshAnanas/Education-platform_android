@@ -222,7 +222,7 @@ class MainViewModel(
                 if (response.isSuccessful) {
 
                     // 200 - OK
-                    val goal = response.body()?.goal
+                    val goal = response.body()?.text
 
                     if (!goal.isNullOrBlank()) {
                         // есть цель
@@ -234,7 +234,7 @@ class MainViewModel(
                         val quoteResponse = remoteCurrentRepository.getRandomQuote()
 
                         if (quoteResponse.isSuccessful) {
-                            onQuoteLoaded(quoteResponse.body()?.text)
+                            onQuoteLoaded(quoteResponse.body()?.quote)
                         }
                     }
 
@@ -246,7 +246,7 @@ class MainViewModel(
                     val quoteResponse = remoteCurrentRepository.getRandomQuote()
 
                     if (quoteResponse.isSuccessful) {
-                        onQuoteLoaded(quoteResponse.body()?.text)
+                        onQuoteLoaded(quoteResponse.body()?.quote)
                     }
                 }
 
@@ -259,7 +259,7 @@ class MainViewModel(
                     val quoteResponse = remoteCurrentRepository.getRandomQuote()
 
                     if (quoteResponse.isSuccessful) {
-                        onQuoteLoaded(quoteResponse.body()?.text)
+                        onQuoteLoaded(quoteResponse.body()?.quote)
                     }
                 } catch (ex: Exception) {
                     Log.e("GOAL_DEBUG", "Quote fallback failed", ex)

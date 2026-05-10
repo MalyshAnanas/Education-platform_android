@@ -97,11 +97,12 @@ class MainFragment : Fragment() {
         // загрузка цели
         viewModel.loadGoalFromServer(
             onGoalLoaded = { goal ->
+                Log.d("GOAL_UI_DEBUG", "Goal received in Fragment: '$goal'")
                 goalEditText.setText(goal)
                 userPreferences.saveGoal(goal ?: "")
             },
             onQuoteLoaded = { quote ->
-                Log.d("QUOTE_DEBUG", "Quote: $quote")
+                Log.d("GOAL_UI_DEBUG", "Quote received in Fragment: '$quote'")
                 goalEditText.setText(quote)
             }
         )

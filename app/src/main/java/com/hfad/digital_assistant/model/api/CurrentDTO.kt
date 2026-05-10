@@ -1,13 +1,15 @@
 package com.hfad.digital_assistant.model.api
 
 data class GoalRequest(
-    val goal: String
+    val text: String
 )
 
 data class GoalResponse(
-    val goal: String?
+    val id: Int?,
+    val text: String?,
+    val created_at: String?
 )
 
 data class QuoteResponse(
-    val text: String
+    val quote: String?
 )
