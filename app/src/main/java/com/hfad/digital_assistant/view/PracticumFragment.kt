@@ -61,7 +61,10 @@ class PracticumFragment : Fragment() {
         // VIEWMODEL
         viewModel = ViewModelProvider(
             this,
-            PracticumViewModelFactory(userPreferences)
+            PracticumViewModelFactory(
+                requireContext(),
+                userPreferences
+            )
         )[PracticumViewModel::class.java]
 
         updateUserHeader(view)

@@ -24,36 +24,42 @@ class PracticumViewModel(
 
     fun loadCases() {
         viewModelScope.launch {
+            try {
+                val result = repository.getAllCases()
 
-            val result = repository.getAllCases()
+                val mapped = result.map { case ->
 
-            val mapped = result.map { case ->
+                    val lastAnswer = case.answers.lastOrNull()
 
-                val lastAnswer = case.answers.lastOrNull()
+                    val status = when (lastAnswer?.status) {
+                        "check" -> CaseUiStatus.CHECKING
+                        "ok" -> CaseUiStatus.DONE
+                        else -> CaseUiStatus.OPEN
+                    }
 
-                val status = when (lastAnswer?.status) {
-                    "check" -> CaseUiStatus.CHECKING
-                    "ok" -> CaseUiStatus.DONE
-                    else -> CaseUiStatus.OPEN
+                    PracticumCaseUi(
+                        id = case.id,
+                        name = case.name,
+                        description = case.description,
+                        status = status,
+                        adminComment = lastAnswer?.comment,
+                        userAnswer = lastAnswer?.text
+                    )
                 }
 
-                PracticumCaseUi(
-                    id = case.id,
-                    name = case.name,
-                    description = case.description,
-                    status = status,
-                    adminComment = lastAnswer?.comment,
-                    userAnswer = lastAnswer?.text
-                )
+                _cases.value = mapped
+
+                // СЧЁТЧИК
+                val done = mapped.count { it.status == CaseUiStatus.DONE }
+                val notDone = mapped.count { it.status != CaseUiStatus.DONE }
+
+                _stats.value = Pair(done, notDone)
+            } catch (e: Exception) {
+
+                _cases.value = emptyList()
+                _stats.value = Pair(0, 0)
             }
 
-            _cases.value = mapped
-
-            // СЧЁТЧИК
-            val done = mapped.count { it.status == CaseUiStatus.DONE }
-            val notDone = mapped.count { it.status != CaseUiStatus.DONE }
-
-            _stats.value = Pair(done, notDone)
         }
     }
 

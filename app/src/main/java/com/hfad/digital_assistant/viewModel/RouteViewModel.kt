@@ -16,25 +16,34 @@ class RouteViewModel(
     private val _completedModules = MutableLiveData<Set<Int>>(emptySet())
     val completedModules: LiveData<Set<Int>> = _completedModules
 
+
+
     // Загружаем модули
     fun loadModules() {
+
         viewModelScope.launch {
+
+            // мгновенно показываем локальные данные
+            _modules.value = repository.getModulesFromDb()
+            _completedModules.value = repository.getCompletedModules()
+
+            // в фоне пытаемся обновиться с сервера
             try {
-                // 1. Загружаем модули
-                _modules.value = repository.getModules()
 
-                // 2. Загружаем локальные completed
-                _completedModules.value = repository.getCompletedModules()
+                val freshModules = repository.refreshModules()
 
-                // 3. Синхронизация с сервером
+                _modules.value = freshModules
+
                 repository.syncWithServer()
 
+                _completedModules.value =
+                    repository.getCompletedModules()
+
             } catch (e: Exception) {
-                Log.e("RouteViewModel", "Ошибка загрузки", e)
+                Log.e("RouteViewModel", "Offline", e)
             }
         }
     }
-
     fun toggleCompleted(moduleId: Int) {
         viewModelScope.launch {
             repository.toggleCompleted(moduleId)

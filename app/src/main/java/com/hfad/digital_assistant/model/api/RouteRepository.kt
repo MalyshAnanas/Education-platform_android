@@ -2,14 +2,102 @@ package com.hfad.digital_assistant.model.api
 
 import com.hfad.digital_assistant.model.local.ModuleCompletionEntity
 import com.hfad.digital_assistant.model.local.ModuleDao
+import com.hfad.digital_assistant.model.local.ModuleEntity
+import com.hfad.digital_assistant.model.local.ModuleItemEntity
 
 class RouteRepository(
     private val api: RouteApi,
     private val dao: ModuleDao
 ) {
 
+    suspend fun refreshModules(): List<Module> {
+
+        val modules = api.getModules()
+
+        saveModulesToDb(modules)
+
+        return modules
+    }
+
+    public suspend fun saveModulesToDb(modules: List<Module>) {
+
+        dao.clearItems()
+        dao.clearModules()
+
+        dao.insertModules(
+            modules.map {
+                ModuleEntity(
+                    id = it.id,
+                    title = it.title,
+                    type = it.type,
+                    order = it.order
+                )
+            }
+        )
+
+        dao.insertItems(
+            modules.flatMap { module ->
+
+                module.items.map { item ->
+
+                    ModuleItemEntity(
+                        id = item.id,
+                        moduleId = module.id,
+                        type = item.type,
+                        text = item.text,
+                        libraryFileSlug = item.library_file?.slug,
+                        order = item.order
+                    )
+                }
+            }
+        )
+    }
+
+    suspend fun getModulesFromDb(): List<Module> {
+
+        val modules = dao.getModules()
+        val items = dao.getModuleItems()
+
+        return modules.map { module ->
+
+            Module(
+                id = module.id,
+                title = module.title,
+                type = module.type,
+                library_file = null,
+                order = module.order,
+
+                items = items
+                    .filter { it.moduleId == module.id }
+                    .sortedBy { it.order }
+                    .map { item ->
+
+                        ModuleItem(
+                            id = item.id,
+                            type = item.type,
+                            text = item.text,
+                            library_file = null,
+                            order = item.order
+                        )
+                    }
+            )
+        }
+    }
+
     suspend fun getModules(): List<Module> {
-        return api.getModules()
+
+        return try {
+
+            val modules = api.getModules()
+
+            saveModulesToDb(modules)
+
+            modules
+
+        } catch (e: Exception) {
+
+            getModulesFromDb()
+        }
     }
 
     suspend fun getCompletedModules(): Set<Int> {
@@ -52,7 +140,8 @@ class RouteRepository(
         toUpload.forEach {
             try {
                 api.completeModule(it)
-            } catch (e: Exception) {}
+            } catch (e: Exception) {
+            }
         }
 
         // что есть на сервере, но нет локально → удаляем на сервере
@@ -61,7 +150,8 @@ class RouteRepository(
         toDelete.forEach {
             try {
                 api.uncompleteModule(it)
-            } catch (e: Exception) {}
+            } catch (e: Exception) {
+            }
         }
     }
 }

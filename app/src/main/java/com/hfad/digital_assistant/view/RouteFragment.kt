@@ -1,5 +1,6 @@
 package com.hfad.digital_assistant.view
 
+
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -13,7 +14,7 @@ import com.hfad.digital_assistant.R
 import com.hfad.digital_assistant.model.api.RouteApi
 import com.hfad.digital_assistant.model.api.RouteRepository
 import com.hfad.digital_assistant.model.api.UserPreferences
-import com.hfad.digital_assistant.model.local.RouteDatabase
+import com.hfad.digital_assistant.model.local.AppDatabase
 import com.hfad.digital_assistant.viewModel.RouteViewModel
 import com.hfad.digital_assistant.viewModel.RouteViewModelFactory
 
@@ -33,7 +34,7 @@ class RouteFragment : Fragment() {
         userPreferences = UserPreferences(requireContext())
         val routeApi = RouteApi.RouteApiFactory.create(userPreferences)
 
-        val db = RouteDatabase.getDatabase(requireContext())
+        val db = AppDatabase.getDatabase(requireContext())
         val dao = db.moduleDao()
 
         val repository = RouteRepository(routeApi, dao)
@@ -70,6 +71,7 @@ class RouteFragment : Fragment() {
                     2 -> showModules("reflection")
                 }
             }
+
             override fun onTabUnselected(tab: TabLayout.Tab) {}
             override fun onTabReselected(tab: TabLayout.Tab) {}
         })
